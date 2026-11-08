@@ -19,12 +19,12 @@ exec --no-startup-id sh -c 'export XDG_CURRENT_DESKTOP=i3'
 exec --no-startup-id picom --config ~/.config/picom/picom.conf
 
 # Kill existing polybar and start fresh
-exec_always --no-startup-id sh -c "killall -q polybar; sleep 1; polybar -c ~/.config/polybar/config.ini toph &"
+exec_always --no-startup-id sh -c "killall -q polybar; while pgrep -u $(id -u) -x polybar >/dev/null; do sleep 0.05; done; exec polybar -c ~/.config/polybar/config.ini toph"
 
 # Background
 # exec_always feh --bg-scale /home/sarang/Pictures/wallpapers/day/_foggy_mountain_with_trees.png -> Static background 
 # Start wallpaper on i3 login/reload
-exec_always --no-startup-id sh -c "$HOME/.config/wallpaper-config/wallpaper-cycle.sh"
+exec --no-startup-id sh -c "$HOME/.config/wallpaper-config/wallpaper-cycle.sh"   # once per login: a reload keeps the current wallpaper
 
 # Keybindings
 bindsym $mod+y exec --no-startup-id sh -c "$HOME/.config/wallpaper-config/wallpaper-cycle.sh"
@@ -39,10 +39,10 @@ bindsym $mod+Shift+y exec --no-startup-id sh -c "$HOME/.config/wallpaper-config/
 font pango:Meslo LGM Nerd Font 11
 
 #Autorotate monitor
-exec_always --no-startup-id /home/sarang/.config/scripts/autorotate.sh
+exec --no-startup-id /home/sarang/.config/scripts/autorotate.sh
 
 # Pen setup 
-exec_always --no-startup-id /home/sarang/.config/scripts/pen-setup.sh
+exec --no-startup-id /home/sarang/.config/scripts/pen-setup.sh
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
@@ -110,9 +110,9 @@ bindsym XF86KbdBrightnessDown exec --no-startup-id asusctl aura power keyboard
 bindsym XF86TouchpadToggle exec --no-startup-id ~/.config/i3/toggle-touchpad.sh
 
 # exec --no-startup-id xinput set-prop "ASUF1204:00 2808:0201 Touchpad" "libinput Natural Scrolling Enabled" 
-exec_always --no-startup-id sh -c "sleep 1; xinput set-prop 'ASUF1204:00 2808:0201 Touchpad' 'libinput Natural Scrolling Enabled' 1"
+exec --no-startup-id sh -c "sleep 1; xinput set-prop 'ASUF1204:00 2808:0201 Touchpad' 'libinput Natural Scrolling Enabled' 1"
 
-exec_always --no-startup-id xinput set-prop "ASUF1204:00 2808:0201 Touchpad" \
+exec --no-startup-id xinput set-prop "ASUF1204:00 2808:0201 Touchpad" \
 "libinput Tapping Button Mapping Enabled" 1 0
 
 # Lockscreen

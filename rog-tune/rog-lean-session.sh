@@ -680,6 +680,10 @@ if has lock; then
 # rog-tune: lock with the current wallpaper (blurred and darkened by login-bg.sh; i3lock only reads PNG).
 # With i3lock-color installed it looks like the macOS lock screen: date and large thin clock on top, round ring with your name at the bottom;
 # with plain i3lock it falls back to the simple lock, and so does it if this i3lock-color build rejects an option.
+# the bar must not show over the lock screen: hide it while locked (only if it was visible) and bring it back on any exit
+hid=0
+if xdotool search --onlyvisible --class polybar >/dev/null 2>&1; then polybar-msg cmd hide >/dev/null 2>&1 && hid=1; fi
+trap '((hid)) && polybar-msg cmd show >/dev/null 2>&1' EXIT
 img=$HOME/.cache/lock-bg.png
 base=(--nofork --ignore-empty-password --show-failed-attempts -c 14110f)
 [[ -f $img ]] && base+=(-i "$img")
@@ -703,7 +707,7 @@ if i3lock --version 2>&1 | grep -q 'Raymond Li'; then
 	i3lock "${base[@]}" "${rich[@]}"; rc=$?
 	((rc == 0 || ($(date +%s%N) - t0) > 2000000000)) && exit "$rc"
 fi
-exec i3lock "${base[@]}"
+i3lock "${base[@]}"
 E
 fi
 if has idle; then
@@ -3891,12 +3895,20 @@ def sync_icons():
             sh("i3-msg", f'rename workspace "{name}" to "{want}"')
 
 def single_instance():
-    try:
-        old = int(PIDF.read_text())
-        if old != os.getpid() and b"display-agent" in Path(f"/proc/{old}/cmdline").read_bytes():
-            os.kill(old, signal.SIGTERM); time.sleep(0.4)
-    except Exception: pass
-    PIDF.write_text(str(os.getpid()))
+    # every other copy goes, not only the one in the pid file: after an i3 restart a copy can be left over, and several of them fight over the flags
+    me = os.getpid(); olds = []
+    for d in Path("/proc").iterdir():
+        try:
+            if d.name.isdigit() and int(d.name) != me:
+                cmd = (d / "cmdline").read_bytes().split(b"\0")
+                if len(cmd) > 1 and b"python" in cmd[0] and cmd[1].endswith(b"display-agent.py"): olds.append(int(d.name))
+        except Exception: pass
+    for sig in (signal.SIGTERM, signal.SIGKILL):
+        for p in olds:
+            try: os.kill(p, sig)
+            except Exception: pass
+        if sig == signal.SIGTERM and olds: time.sleep(0.4)
+    PIDF.write_text(str(me))
 
 def cam_watch():
     """Camera in use: inotify on the webcam's device node (no polling); the flag file + a bar ping when it changes."""
