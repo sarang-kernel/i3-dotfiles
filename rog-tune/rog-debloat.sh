@@ -3,7 +3,7 @@
 #   ~/rog-tune/rog-debloat.sh [groups…]            what would go
 #   sudo ~/rog-tune/rog-debloat.sh --apply [groups…]
 # groups (default: safe)
-#   safe     libinput-gestures (touchegg does your gestures; this one never runs), the *-debug packages of md-viewer-git and yay
+#   safe     libinput-gestures (touchegg does my gestures; this one never runs), the *-debug packages of md-viewer-git and yay
 #   nm       networkmanager + network-manager-applet: NetworkManager is disabled, iwd does Wi-Fi, the applet sits idle in the tray
 #   orphans  packages nothing depends on any more (clang, gcc15, electron39 …): build leftovers. Look at the list first
 #   fonts    iosevka ×2 (2.2 GB), cascadia ×2, fira ×3, firacode-nerd: none is used by kitty/polybar/i3/rofi/dunst configs.

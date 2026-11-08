@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# rog-tune: manual backup of your research to hp-server (rsync over SSH). Runs only when you ask; never deletes anything there.
-#   what to copy: the folders you ticked (Settings -> Backup, or Spotlight -> "Back up"); stored one per line in ~/.config/spotlight/sync.list
+# rog-tune: manual backup of my research to hp-server (rsync over SSH). Runs only when I ask; never deletes anything there.
+#   what to copy: the folders I ticked (Settings -> Backup, or Spotlight -> "Back up"); stored one per line in ~/.config/spotlight/sync.list
 #   where to:     hp-server:Media/rog-backup/  = the external drive on hp-server (override with ROG_SYNC_DEST)
 #   sync-server.sh [-n]    -n shows what would be copied and changes nothing
 DRY=; [[ ${1:-} == -n ]] && DRY=-n
 [[ -r $HOME/.config/rog/settings.env ]] && . "$HOME/.config/rog/settings.env"
-# only new/changed files are sent (size + mtime); with "Mirror deletions" on, files you removed here are removed from the backup too
+# only new/changed files are sent (size + mtime); with "Mirror deletions" on, files I removed here are removed from the backup too
 DEL=; [[ ${BACKUP_MIRROR:-0} == 1 ]] && DEL="--delete-after --max-delete=500"
 DEST=${ROG_SYNC_DEST:-hp-server:Media/rog-backup}   # Media is the external drive on hp-server, NOT its SSD
 LIST=$HOME/.config/spotlight/sync.list

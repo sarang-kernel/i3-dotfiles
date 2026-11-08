@@ -1,23 +1,28 @@
 # i3-dotfiles
 
-Warm amber / chalk i3 setup for an **ASUS ROG Flow X13** (Ryzen 9 7940HS, RTX 4050) on **Arch Linux + X11**. Vim-style keys, no notifications, no on-screen clutter.
+My desktop, lovingly over-engineered. This is the i3 setup I live in on an **ASUS ROG Flow X13** (Ryzen 9 7940HS, RTX 4050, Arch Linux, X11): warm amber and chalk colours, vim-style keys, and not a single notification. If something on my screen makes a noise, it's because I asked it to.
 
-| Folder | What |
+It started as "I'll just tidy the config a bit" and then I kept going. You have been warned.
+
+## What's in here
+| Folder | What it is |
 |---|---|
-| `i3`, `polybar`, `picom`, `kitty`, `rofi`, `btop`, `mpv`, `yazi`, ... | desktop config |
-| `scripts/` | the glue: resident GTK3 **Spotlight** (apps, files, calculator, clipboard history, actions), GTK4/libadwaita **Settings**, power modes, adaptive refresh rate, night tint, rotation, backups to a home server, `rog-update.sh` with rollback |
-| `apps/spotlight/` | a copy of the standalone Spotlight repo (launcher + power menu + installer); `scripts/` holds the live copies |
-| `i3lock/lock.sh` | lock screen: blurred wallpaper; clock + accent ring if `i3lock-color` is installed, plain `i3lock` otherwise |
-| `rog-tune/` | root-side tuning (`rog-tune.sh`: dry run by default, `--apply`, `--undo`) and the user-level installer `rog-lean-session.sh`. Parts include the **greetd + ReGreet** login screen (warm theme, rotates with the accelerometer via sway), restore points before every pacman transaction, power saving on battery, kernel/GRUB options |
-| `rog/settings.env` | the settings the scripts read (Settings app writes it) |
+| `i3`, `polybar`, `picom`, `kitty`, `rofi`, `mpv`, `btop`, `yazi`, ... | the desktop itself: window manager, bar, compositor, terminal and friends |
+| `scripts/` | the glue that holds my days together: my own **Spotlight** (apps, files, maths, clipboard history and actions in one search box), a GTK4/libadwaita **Settings** app, power modes, adaptive refresh rate, night tint, screen rotation, backups to my home server, and `rog-update.sh`, which makes me read the Arch news before it lets me update (and can roll back when I regret it) |
+| `apps/spotlight/` | a copy of my standalone Spotlight repo (launcher, power menu, installer). The live copies sit in `scripts/` |
+| `i3lock/lock.sh` | my lock screen: blurred wallpaper, plus a big thin clock and a round ring with my name on it if `i3lock-color` is installed (plain `i3lock` if not) |
+| `rog-tune/` | the root-side tuning. `rog-tune.sh` is a dry run unless I say `--apply` (and `--undo` exists for moments of doubt); `rog-lean-session.sh` is the user-level installer. Highlights: the **greetd + ReGreet** login screen (warm theme, rotates with the accelerometer), a restore point before every pacman transaction, power saving on battery, kernel and GRUB options |
+| `rog/settings.env` | every setting my scripts read. The Settings app writes it, so I rarely touch it by hand |
 
-## Install
+## Installing it (on a laptop that isn't mine: good luck and godspeed)
 ```
-./install.sh                          # copies the user config, backing up what it replaces
+./install.sh                          # copies my user config, backing up whatever it replaces
 sudo ./rog-tune/rog-tune.sh           # dry run: shows every root change as a diff
-sudo ./rog-tune/rog-tune.sh --apply greetd speed tidy   # example
+sudo ./rog-tune/rog-tune.sh --apply greetd speed tidy   # an example
 ```
-Needs (Arch): `i3-wm polybar picom kitty rofi python-gobject gtk4 libadwaita libqalculate plocate ripgrep xss-lock xclip imagemagick`; optional `i3lock-color` (AUR), `greetd greetd-regreet sway`.
+What I install first (Arch): `i3-wm polybar picom kitty rofi python-gobject gtk4 libadwaita libqalculate plocate ripgrep xss-lock xclip imagemagick`. Optional extras: `i3lock-color` (AUR) for the pretty lock screen, and `greetd greetd-regreet sway` for the login screen.
 
-Machine-specific: monitor name/modes, touchpad id, the PCI addresses and GRUB entries assumed in `rog-tune.sh` are for this laptop. Read the dry run before applying anything.
-`nvim` lives in its own repo.
+## Fair warning
+The monitor name, touchpad id, PCI addresses and GRUB entries in `rog-tune.sh` are all for *my* laptop. Please read the dry run before applying anything; I'd hate to be the reason your boot breaks.
+
+My Neovim config lives in its own repo.

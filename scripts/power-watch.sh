@@ -8,8 +8,8 @@
 #   power-watch.sh timers              re-apply only the lock/blank timers (caffeine uses it)
 #   power-watch.sh display             re-apply only the performance mode, refresh rate and CPU profile (Settings and power-mode.sh use it)
 #   power-watch.sh autoquiet           re-check the low-battery Quiet override now
-#   power-watch.sh refresh             apply only the refresh rate that fits right now (Quiet / cinema / idle / your setting)
-#   power-watch.sh rate                print your configured rate for the current power source (60 in Quiet)
+#   power-watch.sh refresh             apply only the refresh rate that fits right now (Quiet / cinema / idle / my setting)
+#   power-watch.sh rate                print my configured rate for the current power source (60 in Quiet)
 PIDF=${XDG_RUNTIME_DIR:-/tmp}/power-watch.pid
 PS=${ROG_PS:-/sys/class/power_supply}      # (overridable for tests)
 AQ=${XDG_RUNTIME_DIR:-/tmp}/autoquiet.on
@@ -57,7 +57,7 @@ style_apply() { # compositor look: blur and dimming only on AC and never in Quie
 	if [[ $want == ac && $(mode_of ac) != quiet ]]; then ln -sfn picom-ac.conf "$pc/picom.conf"; else ln -sfn picom-bat.conf "$pc/picom.conf"; fi
 	pid=$(pgrep -xo -u "$UID" picom) && kill -USR1 "$pid"
 }
-target_hz() { # ac|bat -> the refresh rate to use right now: cinema = the film rate; Quiet = 60; idle (adaptive) = the idle rate; else your setting
+target_hz() { # ac|bat -> the refresh rate to use right now: cinema = the film rate; Quiet = 60; idle (adaptive) = the idle rate; else my setting
 	local want=$1 m hz rt=${XDG_RUNTIME_DIR:-/tmp}
 	[[ -r $HOME/.config/rog/settings.env ]] && . "$HOME/.config/rog/settings.env"
 	[[ -e $rt/cinema.on ]] && { if [[ -s $rt/cinema.hz ]]; then cat "$rt/cinema.hz"; else echo "${CINEMA_HZ:-71.928}"; fi; return; }      # a film in fullscreen beats everything, Quiet included

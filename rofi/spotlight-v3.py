@@ -378,7 +378,7 @@ def web_item(q: str):
             "payload": q, "icon": "web-browser", "prio": 1000}
 
 def rofi_line(label: str, icon: str) -> str:
-    # Only icon metadata; don't rely on ROFI_INFO (your build doesn't pass it)
+    # Only icon metadata; don't rely on ROFI_INFO (my build doesn't pass it)
     return f"{label}\0icon\x1f{icon}"
 
 def write_last_map(rows):
@@ -416,7 +416,7 @@ def list_phase(q: str):
     items.extend(load_apps())
     items.extend(load_recent())
 
-    # plocate as you type
+    # plocate as I type
     items.extend(plocate_search(qs))
 
     items.append(web_item(qs))

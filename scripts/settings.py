@@ -560,7 +560,7 @@ def page_system(cfg, win):
         g2 = group("SSD health", [Adw.ActionRow(title="Not set up yet", subtitle="Install smartmontools, then:  sudo ~/rog-tune/rog-tune.sh --apply health")])
     return [g1, g2]
 
-# ---------------------------------------------------------------- export / import of your settings
+# ---------------------------------------------------------------- export / import of my settings
 EXPORT_FILES = [".config/rog/settings.env", ".config/spotlight/aliases", ".config/spotlight/roots", ".config/spotlight/sync.list"]
 
 def do_export(win):

@@ -8,7 +8,7 @@
 #  - Escape / no input does nothing
 # ─────────────────────────────────────────────────────────────────
 
-# Path to your spotlight script
+# Path to my spotlight script
 SPOTLIGHT="${SPOTLIGHT_SCRIPT:-$HOME/.config/rofi/scripts/spotlight.py}"
 
 # Power options (Nerd Font icons — swap for plain text if needed)
@@ -21,8 +21,8 @@ options="$lock\n$logout\n$restart\n$poweroff"
 
 # ── Launch rofi ──────────────────────────────────────────────────
 # -format 'i\ns' gives us both the index AND the raw typed string.
-# If the user picks an item  → index is 0-3, string is the label.
-# If the user types freely   → index is -1, string is what they typed.
+# If I pick an item  → index is 0-3, string is the label.
+# If I type freely   → index is -1, string is what I typed.
 # We allow custom input (-no-custom removed) so free typing works.
 read -r idx_raw chosen_raw < <(
 	echo -e "$options" | rofi \
@@ -63,7 +63,7 @@ case "$idx" in
 	;;
 esac
 
-# ── If we reach here the user typed something freely ─────────────
+# ── If we reach here I typed something freely ─────────────
 query="$(echo "$typed" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
 
 # If the query matches a power label exactly, treat it as a selection

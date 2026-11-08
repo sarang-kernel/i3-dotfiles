@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# rog-tune: performance mode for the power source you are on right now (saved, so it is also what plug/unplug restores)
+# rog-tune: performance mode for the power source I am on right now (saved, so it is also what plug/unplug restores)
 #   power-mode.sh quiet | balanced | performance | cycle | status
 #   Quiet       least battery: power-saver CPU profile (CPU capped near 4 GHz, quiet fans), 60 Hz, no blur or dimming
 #   Balanced    everyday

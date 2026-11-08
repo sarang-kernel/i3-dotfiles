@@ -5,7 +5,7 @@
 #   ~/rog-tune/rog-lean-session.sh --undo            restore i3 config, polybar, kitty, .bashrc, autostart files
 # parts (default: all except vaapi)
 #   automount  disable the broken user unit home-sarang-mnt-server.automount (fails at every login)
-#   picom      stop starting picom (i3 line AND /etc/xdg/autostart/picom.desktop, which dex would start anyway). Your picom.conf
+#   picom      stop starting picom (i3 line AND /etc/xdg/autostart/picom.desktop, which dex would start anyway). My picom.conf
 #              draws nothing (no shadows/fades/transparency) yet costs ~4 % of a core at 165 Hz. Cost: possible tearing
 #   compositor lean picom (explicit config: no shadows/fades/blur, damage tracking, unredirects fullscreen) so terminals, polybar and
 #              notifications can be translucent. Replaces the old 'picom' (= turn the compositor off) part
@@ -28,26 +28,26 @@
 #   quiet      no on-screen bars, no notifications (the notification daemon is parked), silent screenshots; brightness shown in the bar
 #   keys       Super+F1 (or Super+/) opens a searchable menu of every i3 keybind
 #   focus      macOS-style centred clock, focus FOLLOWS the mouse (kept), vim-style resize, Super+Ctrl+H/L between workspaces
-#   power      on AC: blur + 90 Hz. On battery: no blur, 60 Hz. Switches by itself when you plug/unplug (event driven, no polling)
+#   power      on AC: blur + 90 Hz. On battery: no blur, 60 Hz. Switches by itself when I plug/unplug (event driven, no polling)
 #   loginbg    keeps the login screen's wallpaper in step with the desktop wallpaper
-#   lock       the lock screen shows your current wallpaper, blurred and darkened (the old script passed a JPEG to i3lock, which only
-#              reads PNG, and read ~/.fehbg, which your wallpaper script never updates)
+#   lock       the lock screen shows my current wallpaper, blurred and darkened (the old script passed a JPEG to i3lock, which only
+#              reads PNG, and read ~/.fehbg, which my wallpaper script never updates)
 #   idle       lock + screen off by power source (AC: 10 / 15 min, battery: 2 / 3 min) and lock before suspend (xss-lock)
 #   ocr        Super+Print: select an area, its text lands on the clipboard (tesseract)
 #   night      Super+Shift+N toggles a warm night tint (~4000 K, display gamma, no daemon); Super+Alt+N returns to the schedule
-#              (on 19:00-07:00, like your wallpapers). Survives mode switches
+#              (on 19:00-07:00, like my wallpapers). Survives mode switches
 #   sysmon     clicking CPU or RAM in the bar, or Super+Shift+Esc, opens a proper GUI task monitor (Mission Center; falls back to
 #              Resources, GNOME System Monitor, then btop)
 #   psd        browser profiles (Chrome, Firefox) live in RAM and sync back to disk: much snappier browsers. Costs ~2 GB of RAM
-#   rotate     the session's auto-rotate: panel, touchscreen and pen follow the accelerometer from the moment you log in (your script only
+#   rotate     the session's auto-rotate: panel, touchscreen and pen follow the accelerometer from the moment I log in (my script only
 #              reacted to later changes, skipped the pen and started a new copy at every i3 restart). Super+Shift+O freezes it
 #   spotlight  Super+D: a real Spotlight. Searches AS YOU TYPE: apps (most-used first), open windows, files (plocate), maths and unit
 #              conversion (qalc), clipboard history (c ...), commands (> ...), system actions (lock, sleep, night tint ...). Vim keys
-#   settings   Super+comma (or Spotlight: "settings"): one window for everything you can toggle or fiddle with (night tint, lock timers,
+#   settings   Super+comma (or Spotlight: "settings"): one window for everything I can toggle or fiddle with (night tint, lock timers,
 #              battery profile, blur, focus-follows-mouse, rotation, tablet mode, Spotlight, backup). Applies immediately
 #   caffeine   Super+Shift+I keeps the screen on and unlocked; (nothing is shown in the bar). It also switches on BY ITSELF
 #              while a window is fullscreen or an app uses the microphone (video, calls); music does not count
-#   tablet     Super+Shift+T toggles tablet mode (OFF by default): an on-screen keyboard that pops up when you touch a text field. Needs onboard
+#   tablet     Super+Shift+T toggles tablet mode (OFF by default): an on-screen keyboard that pops up when I touch a text field. Needs onboard
 #   pin        Super+Shift+P: float the window, keep it above everything and on every workspace (press again to tile it back)
 #   input      touchpad (tap, natural scrolling, palm rejection), pointer speed, key repeat and starting with the mic muted, all from Settings
 #   barfont    workspace numbers in a lighter font, and a compact box around the active workspace; weight, size and box/line are in Settings
@@ -486,8 +486,8 @@ if has power; then
 #   power-watch.sh timers              re-apply only the lock/blank timers (caffeine uses it)
 #   power-watch.sh display             re-apply only the performance mode, refresh rate and CPU profile (Settings and power-mode.sh use it)
 #   power-watch.sh autoquiet           re-check the low-battery Quiet override now
-#   power-watch.sh refresh             apply only the refresh rate that fits right now (Quiet / cinema / idle / your setting)
-#   power-watch.sh rate                print your configured rate for the current power source (60 in Quiet)
+#   power-watch.sh refresh             apply only the refresh rate that fits right now (Quiet / cinema / idle / my setting)
+#   power-watch.sh rate                print my configured rate for the current power source (60 in Quiet)
 PIDF=${XDG_RUNTIME_DIR:-/tmp}/power-watch.pid
 PS=${ROG_PS:-/sys/class/power_supply}      # (overridable for tests)
 AQ=${XDG_RUNTIME_DIR:-/tmp}/autoquiet.on
@@ -535,7 +535,7 @@ style_apply() { # compositor look: blur and dimming only on AC and never in Quie
 	if [[ $want == ac && $(mode_of ac) != quiet ]]; then ln -sfn picom-ac.conf "$pc/picom.conf"; else ln -sfn picom-bat.conf "$pc/picom.conf"; fi
 	pid=$(pgrep -xo -u "$UID" picom) && kill -USR1 "$pid"
 }
-target_hz() { # ac|bat -> the refresh rate to use right now: cinema = the film rate; Quiet = 60; idle (adaptive) = the idle rate; else your setting
+target_hz() { # ac|bat -> the refresh rate to use right now: cinema = the film rate; Quiet = 60; idle (adaptive) = the idle rate; else my setting
 	local want=$1 m hz rt=${XDG_RUNTIME_DIR:-/tmp}
 	[[ -r $HOME/.config/rog/settings.env ]] && . "$HOME/.config/rog/settings.env"
 	[[ -e $rt/cinema.on ]] && { if [[ -s $rt/cinema.hz ]]; then cat "$rt/cinema.hz"; else echo "${CINEMA_HZ:-71.928}"; fi; return; }      # a film in fullscreen beats everything, Quiet included
@@ -599,7 +599,7 @@ while read -r _ <&"${UPW[0]}"; do apply auto; autoquiet_check; done
 E
 	cat >"$W/power-mode.sh" <<'RPM'
 #!/usr/bin/env bash
-# rog-tune: performance mode for the power source you are on right now (saved, so it is also what plug/unplug restores)
+# rog-tune: performance mode for the power source I am on right now (saved, so it is also what plug/unplug restores)
 #   power-mode.sh quiet | balanced | performance | cycle | status
 #   Quiet       least battery: power-saver CPU profile (CPU capped near 4 GHz, quiet fans), 60 Hz, no blur or dimming
 #   Balanced    everyday
@@ -622,7 +622,7 @@ RPM
 	ADD+=("$SD/power-watch.sh|$W/power-watch.sh" "$SD/power-mode.sh|$W/power-mode.sh")
 	if ! grep -q "$MARK: mode" "$W/i3"; then cat >>"$W/i3" <<'E'
 
-# rog-tune: mode — Super+Alt+M cycles Quiet / Balanced / Performance for the power source you are on (also in Spotlight and Settings)
+# rog-tune: mode — Super+Alt+M cycles Quiet / Balanced / Performance for the power source I am on (also in Spotlight and Settings)
 bindsym $mod+Mod1+m exec --no-startup-id ~/.config/scripts/power-mode.sh cycle
 E
 	fi
@@ -678,7 +678,7 @@ if has lock; then
 	cat >"$W/lock.sh" <<'E'
 #!/usr/bin/env bash
 # rog-tune: lock with the current wallpaper (blurred and darkened by login-bg.sh; i3lock only reads PNG).
-# With i3lock-color installed it looks like the macOS lock screen: date and large thin clock on top, round ring with your name at the bottom;
+# With i3lock-color installed it looks like the macOS lock screen: date and large thin clock on top, round ring with my name at the bottom;
 # with plain i3lock it falls back to the simple lock, and so does it if this i3lock-color build rejects an option.
 # the bar must not show over the lock screen: hide it while locked (only if it was visible) and bring it back on any exit
 hid=0
@@ -752,7 +752,7 @@ STATE=${XDG_STATE_HOME:-$HOME/.local/state}/nightlight; mkdir -p "$STATE"
 MODE=$STATE/mode            # auto | on | off
 [[ -r $HOME/.config/rog/settings.env ]] && . "$HOME/.config/rog/settings.env"   # Settings app: NIGHT_GAMMA (tint), NIGHT_START/END
 TINT=${NIGHTLIGHT_TINT:-${NIGHT_GAMMA:-1.0:0.81:0.65}}    # about 4000 K by default
-START=${NIGHT_START:-19} END=${NIGHT_END:-7}              # default: same split as your day/night wallpapers
+START=${NIGHT_START:-19} END=${NIGHT_END:-7}              # default: same split as my day/night wallpapers
 out=$(xrandr --query | awk '/ connected/{print $1; exit}'); out=${out:-eDP-1}
 mode() { cat "$MODE" 2>/dev/null || echo auto; }
 want() {
@@ -930,14 +930,14 @@ if has spotlight; then
 	sed -i -E '/^bindsym \$mod\+d exec --no-startup-id rofi \\$/,/^  -theme .*\\$/ { s/\\$//; s/^/# rog-tune: /; }' "$W/i3"
 	if ! grep -q "$MARK: spotlight" "$W/i3"; then cat >>"$W/i3" <<'E'
 
-# rog-tune: spotlight — Super+D, searches as you type (apps, windows, files, maths, clipboard, actions)
+# rog-tune: spotlight — Super+D, searches as I type (apps, windows, files, maths, clipboard, actions)
 bindsym $mod+d exec --no-startup-id ~/.config/scripts/rog-ui.sh spotlight
 for_window [class="^Spotlight$"] floating enable, border none
 E
 	fi
 	if ! grep -q "rog-sync" "$W/i3"; then cat >>"$W/i3" <<'E'
 
-# rog-tune: spotlight — the manual backup runs in a floating terminal so you can see its progress
+# rog-tune: spotlight — the manual backup runs in a floating terminal so I can see its progress
 for_window [class="^rog-sync$"] floating enable, resize set 1100 640, move position center
 E
 	fi
@@ -1525,7 +1525,7 @@ def page_system(cfg, win):
         g2 = group("SSD health", [Adw.ActionRow(title="Not set up yet", subtitle="Install smartmontools, then:  sudo ~/rog-tune/rog-tune.sh --apply health")])
     return [g1, g2]
 
-# ---------------------------------------------------------------- export / import of your settings
+# ---------------------------------------------------------------- export / import of my settings
 EXPORT_FILES = [".config/rog/settings.env", ".config/spotlight/aliases", ".config/spotlight/roots", ".config/spotlight/sync.list"]
 
 def do_export(win):
@@ -1705,8 +1705,8 @@ RSET
 #   Enter run/open   Ctrl+Enter reveal folder / run in a terminal   Ctrl+C copy (a file copies as the file)   Esc close
 #   Ctrl+J/K or Ctrl+N/P or Up/Down move   Alt+1..9 pick a row   Tab next row
 #   prefixes:  =2+2 (maths)   c word (clipboard history)   > cmd (run a command)   w word (windows only)
-# Searches while you type (plocate for files, qalc for maths). Closes itself when it loses focus. Nothing stays resident.
-import json, math, os, re, shlex, subprocess, sys, time
+# Searches while I type (plocate for files, qalc for maths). Closes itself when it loses focus. Nothing stays resident.
+import json, math, os, re, shlex, subprocess, sys, threading, time
 from pathlib import Path
 import gi
 gi.require_version("Gtk", "3.0"); gi.require_version("Gdk", "3.0")
@@ -1727,7 +1727,8 @@ def sh(cmd, timeout=1.0):
         return ""
 
 def spawn(cmd):
-    subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, stdin=subprocess.DEVNULL, start_new_session=True)
+    p = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, stdin=subprocess.DEVNULL, start_new_session=True)
+    threading.Thread(target=p.wait, daemon=True).start()     # reap it when it ends (no <defunct> children of this long-lived process)
 
 def copy(text):
     p = subprocess.Popen(["xclip", "-selection", "clipboard"], stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
@@ -2978,7 +2979,7 @@ class Spot(Gtk.Window):
         threading.Thread(target=work, daemon=True).start()
 
     def show_deep(self, q, res):
-        if self.deep_q == q:                               # the user may have typed on since
+        if self.deep_q == q:                               # I may have typed on since
             self.render(res, q, None if res else f"Nothing inside your documents matches “{q}”")
         return False
 
@@ -3221,7 +3222,7 @@ E
 # rog-tune: client for the resident Spotlight/Settings process (it starts at login, so opening is near-instant).
 #   rog-ui.sh spotlight          show Spotlight (toggles); lives in a small resident process
 #   rog-ui.sh apps               browse every installed app (also: Alt+A inside Spotlight)
-#   rog-ui.sh clip               Spotlight pre-filled with "c ": your clipboard history (the same process records it)
+#   rog-ui.sh clip               Spotlight pre-filled with "c ": my clipboard history (the same process records it)
 #   rog-ui.sh settings | backup  open Settings / the backup chooser as ordinary windows (nothing stays in memory afterwards)
 #   rog-ui.sh start | restart | quit   manage the resident Spotlight process
 RT=${XDG_RUNTIME_DIR:-/tmp}; FIFO=$RT/rog-ui.fifo; PIDF=$RT/rog-ui.pid
@@ -3239,7 +3240,7 @@ esac
 RUI
 	cat >"$W/rog-update.sh" <<'RUPD'
 #!/usr/bin/env bash
-# rog-tune: update the system the careful way: show the Arch news since your last update first, then (if you agree) run pacman -Syu.
+# rog-tune: update the system the careful way: show the Arch news since my last update first, then (if I agree) run pacman -Syu.
 #   Arch occasionally needs a manual step before an update (a changed package, a config to edit); that is announced in the news.
 red=$'\e[1;31m'; yel=$'\e[1;33m'; dim=$'\e[2m'; off=$'\e[0m'
 
@@ -3307,7 +3308,7 @@ read -rp "Done. Press Enter to close "
 RUPD
 	cat >"$W/alarm.py" <<'RALARM'
 #!/usr/bin/env python3
-# rog-tune: the window a Spotlight timer or reminder shows when it rings. Stays until you dismiss it (Enter / Esc); S snoozes 5 minutes.
+# rog-tune: the window a Spotlight timer or reminder shows when it rings. Stays until I dismiss it (Enter / Esc); S snoozes 5 minutes.
 #   alarm.py "message"        (started by systemd-run --user when the time comes)
 import json, os, subprocess, sys, threading, time
 from pathlib import Path
@@ -3561,13 +3562,13 @@ exit 0
 RPRE
 	cat >"$W/sync-server.sh" <<'RSYN'
 #!/usr/bin/env bash
-# rog-tune: manual backup of your research to hp-server (rsync over SSH). Runs only when you ask; never deletes anything there.
-#   what to copy: the folders you ticked (Settings -> Backup, or Spotlight -> "Back up"); stored one per line in ~/.config/spotlight/sync.list
+# rog-tune: manual backup of my research to hp-server (rsync over SSH). Runs only when I ask; never deletes anything there.
+#   what to copy: the folders I ticked (Settings -> Backup, or Spotlight -> "Back up"); stored one per line in ~/.config/spotlight/sync.list
 #   where to:     hp-server:Media/rog-backup/  = the external drive on hp-server (override with ROG_SYNC_DEST)
 #   sync-server.sh [-n]    -n shows what would be copied and changes nothing
 DRY=; [[ ${1:-} == -n ]] && DRY=-n
 [[ -r $HOME/.config/rog/settings.env ]] && . "$HOME/.config/rog/settings.env"
-# only new/changed files are sent (size + mtime); with "Mirror deletions" on, files you removed here are removed from the backup too
+# only new/changed files are sent (size + mtime); with "Mirror deletions" on, files I removed here are removed from the backup too
 DEL=; [[ ${BACKUP_MIRROR:-0} == 1 ]] && DEL="--delete-after --max-delete=500"
 DEST=${ROG_SYNC_DEST:-hp-server:Media/rog-backup}   # Media is the external drive on hp-server, NOT its SSD
 LIST=$HOME/.config/spotlight/sync.list
@@ -3598,7 +3599,7 @@ if has caffeine; then
 	awk '/^; rog-tune: caffeine/{skip=1; next} /^\[module\/caffeine\]/{skip=1; next} skip && /^\[/{skip=0} !skip' "$W/pb" >"$W/pb.n" && mv "$W/pb.n" "$W/pb"
 	if ! grep -q "$MARK: caffeine" "$W/i3"; then cat >>"$W/i3" <<'E'
 
-# rog-tune: caffeine — Super+Shift+I keeps the screen on and unlocked until you press it again
+# rog-tune: caffeine — Super+Shift+I keeps the screen on and unlocked until I press it again
 bindsym $mod+Shift+i exec --no-startup-id ~/.config/scripts/caffeine.sh toggle
 E
 	fi
@@ -3739,7 +3740,7 @@ RIN
 # rog-tune: things that happen once per login (not on every i3 restart)
 [[ -r $HOME/.config/rog/settings.env ]] && . "$HOME/.config/rog/settings.env"
 if [[ ${MIC_MUTE_LOGIN:-0} == 1 ]]; then sleep 3; pactl set-source-mute @DEFAULT_SOURCE@ 1; fi
-# put the screen back to the brightness you chose last (the login screen raises a nearly-dark screen so it can be read)
+# put the screen back to the brightness I chose last (the login screen raises a nearly-dark screen so it can be read)
 b=$HOME/.local/state/rog/brightness
 if [[ -r $b ]] && [[ $(<"$b") =~ ^[0-9]+$ ]]; then
 	BL=(); [[ -d /sys/class/backlight/nvidia_wmi_ec_backlight ]] && BL=(-d nvidia_wmi_ec_backlight)
@@ -4087,7 +4088,7 @@ if [[ -e $W/rofi-main ]]; then
 fi
 for a in "${ADD[@]+"${ADD[@]}"}"; do
 	d=${a%%|*}; s=${a#*|}; mkdir -p "$(dirname "$d")"
-	if [[ $d == */chrome-flags.conf || $d == */dunstrc || $d == */settings.ini || $d == */psd.conf ]]; then # never overwrite a file you wrote yourself
+	if [[ $d == */chrome-flags.conf || $d == */dunstrc || $d == */settings.ini || $d == */psd.conf ]]; then # never overwrite a file I wrote myself
 		if [[ -e $d ]] && ! grep -qxF "$d" "$BK/created.list" 2>/dev/null; then echo "keeping existing $d"; continue; fi
 		grep -qxF "$d" "$BK/created.list" 2>/dev/null || echo "$d" >>"$BK/created.list"
 	fi

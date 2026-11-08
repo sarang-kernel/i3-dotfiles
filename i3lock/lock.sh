@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # rog-tune: lock with the current wallpaper (blurred and darkened by login-bg.sh; i3lock only reads PNG).
-# With i3lock-color installed it looks like the macOS lock screen: date and large thin clock on top, round ring with your name at the bottom;
+# With i3lock-color installed it looks like the macOS lock screen: date and large thin clock on top, round ring with my name at the bottom;
 # with plain i3lock it falls back to the simple lock, and so does it if this i3lock-color build rejects an option.
 # the bar must not show over the lock screen: hide it while locked (only if it was visible) and bring it back on any exit
 hid=0

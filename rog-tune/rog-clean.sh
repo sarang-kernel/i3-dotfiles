@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Throw away regenerable caches on rog (no sudo). Dry run by default: shows sizes.
 #   ~/rog-tune/rog-clean.sh [--apply] [--trash] [--browsers]
-# Removes: Ferdium per-service Cache / Code Cache / GPUCache / Service Worker caches (~5 GB; the apps rebuild them, you stay
+# Removes: Ferdium per-service Cache / Code Cache / GPUCache / Service Worker caches (~5 GB; the apps rebuild them, I stay
 # logged in), ~/.cache/{pip,pnpm,yay,ms-playwright}. Never touches logins, cookies, settings or the browsers' own caches.
 # --browsers also clears the web caches of Chrome, Firefox, Zen, qutebrowser and the Electron chat apps, but only for apps that are NOT
 # running right now (their logins, history and settings are never touched; pages just load a little slower once).

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Trim Ferdium's idle cost. Changes only settings, not your services or logins, and keeps a backup.
+# Trim Ferdium's idle cost. Changes only settings, not my services or logins, and keeps a backup.
 #   ~/rog-tune/ferdium-lean.sh            show what would change (Ferdium may be running)
 #   ~/rog-tune/ferdium-lean.sh --apply    do it; refuses while Ferdium is running, because it rewrites this file on exit
 #   ~/rog-tune/ferdium-lean.sh --undo     put the backup back

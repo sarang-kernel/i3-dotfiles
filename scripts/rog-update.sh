@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# rog-tune: update the system the careful way: show the Arch news since your last update first, then (if you agree) run pacman -Syu.
+# rog-tune: update the system the careful way: show the Arch news since my last update first, then (if I agree) run pacman -Syu.
 #   Arch occasionally needs a manual step before an update (a changed package, a config to edit); that is announced in the news.
 red=$'\e[1;31m'; yel=$'\e[1;33m'; dim=$'\e[2m'; off=$'\e[0m'
 
