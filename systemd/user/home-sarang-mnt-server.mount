@@ -1,0 +1,13 @@
+[Unit]
+Description=SSHFS Mount for hp-server
+After=network-online.target
+Wants=network-online.target
+
+[Mount]
+What=hp-server:/home/sarang
+Where=/home/sarang/mnt/server
+Type=fuse.sshfs
+Options=reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,_netdev,idmap=user,delay_connect
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,47 @@
+# rog-tune: dunst — Catppuccin Mocha, square corners (no compositor here), progress bar for the volume/brightness OSD
+[global]
+    monitor = 0
+    follow = keyboard
+    width = (260, 380)
+    origin = top-right
+    offset = (16, 16)
+    notification_limit = 5
+    gap_size = 8
+    padding = 12
+    horizontal_padding = 14
+    frame_width = 2
+    corner_radius = 0
+    progress_bar_height = 10
+    progress_bar_frame_width = 0
+    indicate_hidden = yes
+    separator_height = 0
+    font = MesloLGS Nerd Font Mono 11
+    markup = full
+    format = "<b>%s</b>\n%b"
+    alignment = left
+    icon_position = left
+    max_icon_size = 56
+    enable_recursive_icon_lookup = true
+    icon_theme = Papirus-Dark
+    sticky_history = yes
+    history_length = 30
+    mouse_left_click = close_current
+    mouse_middle_click = do_action, close_current
+    mouse_right_click = close_all
+[urgency_low]
+    background = "#1e1e2ee6"
+    foreground = "#a6adc8"
+    frame_color = "#45475a"
+    timeout = 4
+[urgency_normal]
+    background = "#1e1e2ee6"
+    foreground = "#cdd6f4"
+    frame_color = "#cba6f7"
+    highlight = "#cba6f7"
+    timeout = 6
+[urgency_critical]
+    background = "#1e1e2ee6"
+    foreground = "#cdd6f4"
+    frame_color = "#f38ba8"
+    highlight = "#f38ba8"
+    timeout = 0

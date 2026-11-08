@@ -1,0 +1,5 @@
+pulse/cookie
+*.bak*
+__pycache__/
+*.pyc
+.no-autostartx

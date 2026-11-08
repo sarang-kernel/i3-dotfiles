@@ -22,8 +22,9 @@ DAY_HASH_FILE="$CACHE_DIR/hash_day"
 NIGHT_HASH_FILE="$CACHE_DIR/hash_night"
 ALL_HASH_FILE="$CACHE_DIR/hash_all"
 
-DAY_START=7
-NIGHT_START=19
+[[ -r "$HOME/.config/rog/settings.env" ]] && . "$HOME/.config/rog/settings.env"
+DAY_START=${WALL_DAY_START:-7}
+NIGHT_START=${WALL_NIGHT_START:-19}
 
 log() { echo "[$(date '+%F %T')] $*" >>"$LOG_FILE"; }
 
@@ -68,6 +69,7 @@ apply_prev() {
 
 	# Cache it for lockscreen
 	echo "$wp" >"$CURRENT_WP_CACHE"
+	"$HOME/.config/scripts/login-bg.sh" "$wp" &
 
 	echo "$prev" >"$INDEX_FILE"
 }

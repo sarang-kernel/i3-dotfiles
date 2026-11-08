@@ -1,15 +1,15 @@
 /* Spotlight-style Rofi theme (Catppuccin Mocha-ish) */
 
 * {
-    bg-col:           #1e1e2e;
-    bg-col-light:     #181825;
-    border-col:       #313244;
-    selected-col:     #313244;
+    bg-col:           #1c1917;
+    bg-col-light:     #14110f;
+    border-col:       #2b2622;
+    selected-col:     #2b2622;
 
-    blue:             #89b4fa;
-    fg-col:           #cdd6f4;
-    fg-muted:         #a6adc8;
-    fg-accent:        #f38ba8;
+    blue:             #e0a458;
+    fg-col:           #e7dfd3;
+    fg-muted:         #b5aa9a;
+    fg-accent:        #e06c5a;
 
     width:            780px;
     font:             "JetBrainsMono Nerd Font 18";
@@ -28,12 +28,12 @@ window {
     border: 2px;
     border-radius: 16px;
     border-color: @border-col;
-    background-color: @bg-col;
+    background-color: #1c1917d9;
 }
 
 mainbox {
     padding: 14px;
-    background-color: @bg-col;
+    background-color: transparent;
 }
 
 inputbar {

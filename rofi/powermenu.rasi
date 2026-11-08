@@ -4,16 +4,16 @@
    Icons:   system icon theme (Papirus recommended); falls back gracefully.  */
 
 * {
-    bg0:  #0d0f14;
-    bg1:  #13161d;
-    bg2:  #1a1d28;
-    bdr:  #2a3050;
-    acc:  #7aa2f7;
-    acc2: #bb9af7;
-    urg:  #f7768e;
-    fg0:  #c0caf5;
-    fg1:  #ffffff;
-    fgd:  #3b4261;
+    bg0:  #0f0d0c;
+    bg1:  #14110f;
+    bg2:  #1c1917;
+    bdr:  #3a342e;
+    acc:  #e0a458;
+    acc2: #e39a5f;
+    urg:  #e06c5a;
+    fg0:  #e7dfd3;
+    fg1:  #f5ede0;
+    fgd:  #6e655a;
 
     background-color: transparent;
     text-color:       @fg0;

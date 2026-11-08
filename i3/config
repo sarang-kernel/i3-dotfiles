@@ -8,10 +8,15 @@
 # i3 config file (v4)
 #
 # Please see https://i3wm.org/docs/userguide.html for a complete reference!
-
+# set $alt Mod1
 set $mod Mod4
 
-exec -no-startup-id picom 
+# Export graphical session env to systemd user services
+exec --no-startup-id systemctl --user import-environment DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS XDG_CURRENT_DESKTOP
+exec --no-startup-id dbus-update-activation-environment --systemd DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS XDG_CURRENT_DESKTOP
+exec --no-startup-id sh -c 'export XDG_CURRENT_DESKTOP=i3'
+
+exec --no-startup-id picom --config ~/.config/picom/picom.conf
 
 # Kill existing polybar and start fresh
 exec_always --no-startup-id sh -c "killall -q polybar; sleep 1; polybar -c ~/.config/polybar/config.ini toph &"
@@ -26,14 +31,18 @@ bindsym $mod+y exec --no-startup-id sh -c "$HOME/.config/wallpaper-config/wallpa
 bindsym $mod+Shift+y exec --no-startup-id sh -c "$HOME/.config/wallpaper-config/wallpaper-cycle-reverse.sh"
 
 # Screenshot 
-# Screenshot full screen (autosave to pictures)
-bindsym Print exec scrot ~/Pictures/screenshot_%Y-%m-%d_%H-%M-%S.png
-# Screenshot selection
-bindsym Shift+Print exec scrot -s ~/Pictures/screenshot_%Y-%m-%d_%H-%M-%S.png
+# Full screen
 
+# Selection
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
 font pango:Meslo LGM Nerd Font 11
+
+#Autorotate monitor
+exec_always --no-startup-id /home/sarang/.config/scripts/autorotate.sh
+
+# Pen setup 
+exec_always --no-startup-id /home/sarang/.config/scripts/pen-setup.sh
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
@@ -41,7 +50,6 @@ font pango:Meslo LGM Nerd Font 11
 
 # Start XDG autostart .desktop files using dex. See also
 # https://wiki.archlinux.org/index.php/XDG_Autostart
-exec --no-startup-id dex --autostart --environment i3
 
 # The combination of xss-lock, nm-applet and pactl is a popular choice, so
 # they are included here as an example. Modify as you see fit.
@@ -52,17 +60,17 @@ exec --no-startup-id dex --autostart --environment i3
 
 # NetworkManager is the most popular way to manage wireless networks on Linux,
 # and nm-applet is a desktop environment-independent system tray GUI for it.
-exec --no-startup-id nm-applet
+# rog-tune: exec --no-startup-id nm-applet
 
 # === Clipboard -> Cliphist ===
 # exec --no-startup-id greenclip daemon 
-exec --no-startup-id sh -lc 'pgrep -x greenclip >/dev/null || greenclip daemon'
+# rog-tune: exec --no-startup-id sh -lc 'pgrep -x greenclip >/dev/null || greenclip daemon'
 
 # Launch clipboard history
-bindsym $mod+Shift+v exec rofi \
-  -modi "clipboard:greenclip print" \
-  -show clipboard \
-  -theme ~/.config/rofi/catppuccin-mocha.rasi
+# rog-tune: bindsym $mod+Shift+v exec rofi 
+# rog-tune:   -modi "clipboard:greenclip print" 
+# rog-tune:   -show clipboard 
+# rog-tune:   -theme ~/.config/rofi/catppuccin-mocha.rasi
 
 ### ======== keyboard settings ============
 # exec --no-startup-id setxkbmap -option caps:super
@@ -74,10 +82,10 @@ bindsym $mod+Shift+v exec rofi \
 
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status
-bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
-bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
-bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
-bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
+bindsym XF86AudioRaiseVolume exec --no-startup-id ~/.config/scripts/osd.sh vol up
+bindsym XF86AudioLowerVolume exec --no-startup-id ~/.config/scripts/osd.sh vol down
+bindsym XF86AudioMute exec --no-startup-id ~/.config/scripts/osd.sh vol mute
+bindsym XF86AudioMicMute exec --no-startup-id ~/.config/scripts/osd.sh mic
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -88,20 +96,28 @@ tiling_drag modifier titlebar
 
 
 # Brighntess
-bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set +5%
-bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 5%-
+bindsym XF86MonBrightnessUp exec --no-startup-id ~/.config/scripts/osd.sh bri up
+bindsym XF86MonBrightnessDown exec --no-startup-id ~/.config/scripts/osd.sh bri down
 
 # Keyboard brighntess 
-bindsym XF86KbdBrightnessUp exec --no-startup-id brightnessctl -d asus::kbd_backlight set +1
-bindsym XF86KbdBrightnessDown exec --no-startup-id brightnessctl -d asus::kbd_backlight set 1-
+# bindsym XF86KbdBrightnessUp exec --no-startup-id brightnessctl -d asus::kbd_backlight set +1
+# bindsym XF86KbdBrightnessDown exec --no-startup-id brightnessctl -d asus::kbd_backlight set 1-
+
+bindsym XF86KbdBrightnessUp   exec --no-startup-id asusctl aura power keyboard --boot --awake --sleep
+bindsym XF86KbdBrightnessDown exec --no-startup-id asusctl aura power keyboard
 
 # Touchpad toggle
 bindsym XF86TouchpadToggle exec --no-startup-id ~/.config/i3/toggle-touchpad.sh
-exec --no-startup-id xinput set-prop "ASUF1204:00 2808:0201 Touchpad" "libinput Natural Scrolling Enabled" 1
+
+# exec --no-startup-id xinput set-prop "ASUF1204:00 2808:0201 Touchpad" "libinput Natural Scrolling Enabled" 
+exec_always --no-startup-id sh -c "sleep 1; xinput set-prop 'ASUF1204:00 2808:0201 Touchpad' 'libinput Natural Scrolling Enabled' 1"
+
+exec_always --no-startup-id xinput set-prop "ASUF1204:00 2808:0201 Touchpad" \
+"libinput Tapping Button Mapping Enabled" 1 0
 
 # Lockscreen
 bindsym $mod+Shift+l exec --no-startup-id $HOME/.config/i3lock/lock.sh
-exec --no-startup-id xautolock -time 10 -locker $HOME/.config/i3lock/lock.sh
+# rog-tune: exec --no-startup-id xautolock -time 10 -locker $HOME/.config/i3lock/lock.sh
 
 
 # start a terminal
@@ -122,11 +138,11 @@ bindsym $mod+Escape exec --no-startup-id bash -lc '~/.config/rofi/powermenu.sh'
 
 
 # dmenu has been replaced by spotlight
-bindsym $mod+d exec --no-startup-id rofi \
-  -show spotlight \
-  -modi "spotlight:$HOME/.config/rofi/spotlight-v3.py" \
-  -show-icons \
-  -theme ~/.config/rofi/catppuccin-mocha.rasi \
+# rog-tune: bindsym $mod+d exec --no-startup-id rofi 
+# rog-tune:   -show spotlight 
+# rog-tune:   -modi "spotlight:$HOME/.config/rofi/spotlight-v3.py" 
+# rog-tune:   -show-icons 
+# rog-tune:   -theme ~/.config/rofi/catppuccin-mocha.rasi 
 
   # -kb-custom-1 "Control+Return" \
   # -kb-custom-2 "Alt+Return" \
@@ -246,10 +262,10 @@ mode "resize" {
         # Pressing right will grow the window’s width.
         # Pressing up will shrink the window’s height.
         # Pressing down will grow the window’s height.
-        bindsym j resize shrink width 10 px or 10 ppt
-        bindsym k resize grow height 10 px or 10 ppt
-        bindsym l resize shrink height 10 px or 10 ppt
-        bindsym semicolon resize grow width 10 px or 10 ppt
+        bindsym h resize shrink width 10 px or 10 ppt
+        bindsym j resize grow height 10 px or 10 ppt
+        bindsym k resize shrink height 10 px or 10 ppt
+        bindsym l resize grow width 10 px or 10 ppt
 
         # same bindings, but for the arrow keys
         bindsym Left resize shrink width 10 px or 10 ppt
@@ -271,3 +287,106 @@ bindsym $mod+r mode "resize"
 #         status_command i3status
 # 	font pango: JetBrainsMono Nerd Font 11
 # }
+
+# rog-tune: shot — screenshots land on the clipboard (and in ~/Pictures unless noted)
+bindsym Print exec --no-startup-id ~/.config/scripts/shot.sh full
+bindsym Insert exec --no-startup-id ~/.config/scripts/shot.sh full
+bindsym Shift+Print exec --no-startup-id ~/.config/scripts/shot.sh area
+bindsym Shift+Insert exec --no-startup-id ~/.config/scripts/shot.sh area
+bindsym Shift+Delete exec --no-startup-id ~/.config/scripts/shot.sh area
+bindsym Ctrl+Print exec --no-startup-id ~/.config/scripts/shot.sh area-clip
+bindsym Mod1+Print exec --no-startup-id ~/.config/scripts/shot.sh window
+
+# rog-tune: ui — warm palette, pixel borders (no title bars), windows tile edge to edge
+default_border pixel 2
+default_floating_border pixel 2
+hide_edge_borders smart
+client.focused  #e0a458 #1c1917 #e7dfd3 #e0a458 #e0a458
+client.focused_inactive  #3a342e #1c1917 #b5aa9a #3a342e #3a342e
+client.unfocused  #2b2622 #14110f #6e655a #2b2622 #2b2622
+client.urgent  #e06c5a #e06c5a #0f0d0c #e06c5a #e06c5a
+client.placeholder  #14110f #14110f #e7dfd3 #14110f #14110f
+client.background       #1c1917
+exec_always --no-startup-id xsetroot -cursor_name left_ptr
+
+# rog-tune: binds — notifications, bar toggle, small conveniences
+bindsym $mod+b exec --no-startup-id polybar-msg cmd toggle
+workspace_auto_back_and_forth yes
+for_window [class="Pavucontrol"] floating enable
+for_window [class="Blueberry.py"] floating enable
+for_window [class="Nm-connection-editor"] floating enable
+for_window [class="Lxappearance"] floating enable
+for_window [window_role="pop-up"] floating enable
+for_window [window_type="dialog"] floating enable
+
+# rog-tune: keys — searchable list of every keybind
+bindsym $mod+F1 exec --no-startup-id ~/.config/scripts/keys.sh
+bindsym $mod+slash exec --no-startup-id ~/.config/scripts/keys.sh
+
+# rog-tune: focus — focus follows the mouse; vim-style workspace hops
+focus_follows_mouse yes
+bindsym $mod+Ctrl+h workspace prev
+bindsym $mod+Ctrl+l workspace next
+bindsym $mod+Ctrl+Shift+h move container to workspace prev; workspace prev
+bindsym $mod+Ctrl+Shift+l move container to workspace next; workspace next
+exec_always --no-startup-id ~/.config/scripts/power-watch.sh  # rog-tune: power
+
+# rog-tune: ocr — select an area, its text goes to the clipboard
+bindsym $mod+Print exec --no-startup-id ~/.config/scripts/ocr.sh
+
+# rog-tune: night — warm tint: Super+Shift+N toggles, Super+Alt+N back to the schedule (19:00-07:00)
+bindsym $mod+Shift+n exec --no-startup-id ~/.config/scripts/nightlight.sh toggle
+bindsym $mod+Mod1+n exec --no-startup-id ~/.config/scripts/nightlight.sh auto
+exec_always --no-startup-id ~/.config/scripts/nightlight.sh daemon
+
+# rog-tune: sysmon — GUI task monitor (also: click CPU or RAM in the bar)
+bindsym $mod+Shift+Escape exec --no-startup-id ~/.config/scripts/sysmon.sh
+exec --no-startup-id xss-lock --transfer-sleep-lock -- /home/sarang/.config/i3lock/lock.sh  # rog-tune: idle
+
+# rog-tune: rotate — Super+Shift+O freezes/unfreezes auto-rotation
+bindsym $mod+Shift+o exec --no-startup-id ~/.config/scripts/autorotate.sh lock
+
+# rog-tune: spotlight — Super+D, searches as you type (apps, windows, files, maths, clipboard, actions)
+bindsym $mod+d exec --no-startup-id ~/.config/scripts/rog-ui.sh spotlight
+for_window [class="^Spotlight$"] floating enable, border none, move position center, move up 260px
+
+# rog-tune: caffeine — Super+Shift+I keeps the screen on and unlocked until you press it again
+bindsym $mod+Shift+i exec --no-startup-id ~/.config/scripts/caffeine.sh toggle
+
+# rog-tune: tablet — Super+Shift+T toggles tablet mode (on-screen keyboard); it is OFF at every login
+bindsym $mod+Shift+t exec --no-startup-id ~/.config/scripts/tablet.sh toggle
+
+# rog-tune: pin — Super+Shift+P floats the window above everything on every workspace; press again to tile it back
+bindsym $mod+Shift+p exec --no-startup-id ~/.config/scripts/pin.sh
+
+# rog-tune: spotlight — the manual backup runs in a floating terminal so you can see its progress
+for_window [class="^rog-sync$"] floating enable, resize set 1100 640, move position center
+
+# rog-tune: autocaffeine — screen stays on while a window is fullscreen or an app uses the microphone
+exec_always --no-startup-id ~/.config/scripts/autocaffeine.sh
+
+# rog-tune: settings — Super+comma opens the settings window (also in Spotlight: type "settings")
+bindsym $mod+comma exec --no-startup-id ~/.config/scripts/rog-ui.sh settings
+for_window [class="^RogSettings$"] fullscreen enable
+
+# rog-tune: spotlight — Spotlight and Settings live in one resident process (started once; opening is instant)
+exec_always --no-startup-id ~/.config/scripts/rog-ui.sh start
+
+# rog-tune: input — touchpad, pointer speed and key repeat from the Settings app; the mic can start muted
+exec_always --no-startup-id ~/.config/scripts/input-apply.sh
+exec --no-startup-id ~/.config/scripts/login-apply.sh
+
+# rog-tune: mode — Super+Alt+M cycles Quiet / Balanced / Performance for the power source you are on (also in Spotlight and Settings)
+bindsym $mod+Mod1+m exec --no-startup-id ~/.config/scripts/power-mode.sh cycle
+
+# rog-tune: clip — Super+Shift+V: clipboard history in Spotlight (recorded by the resident process, no polling daemon)
+bindsym $mod+Shift+v exec --no-startup-id ~/.config/scripts/rog-ui.sh clip
+
+# rog-tune: alarm — a Spotlight timer or reminder rings in a centred box that stays until dismissed
+for_window [class="^RogAlarm$"] floating enable, border pixel 3, move position center
+
+# rog-tune: display — adaptive refresh (idle = lower rate) and cinema mode (fullscreen video player = a rate that fits the film), one small agent
+exec_always --no-startup-id python3 ~/.config/scripts/display-agent.py
+
+# rog-tune: wallpaper-timer — optional automatic wallpaper change (Settings -> Wallpaper)
+exec_always --no-startup-id ~/.config/scripts/wallpaper-timer.sh

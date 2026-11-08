@@ -1,0 +1,10 @@
+[Unit]
+Description=Automount for hp-server
+After=network-online.target
+
+[Automount]
+Where=/home/sarang/mnt/server
+TimeoutIdleSec=0
+
+[Install]
+WantedBy=default.target

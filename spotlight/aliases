@@ -1,0 +1,1 @@
+# your own shortcuts for Spotlight:  name = what to open  (a folder, a file, a web address, or a command)\n# examples (remove the # to use):\n# thesis = ~/Documents/thesis\n# overleaf = https://www.overleaf.com/project\n# gpu = kitty -e nvidia-smi\n
