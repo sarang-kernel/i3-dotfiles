@@ -13,7 +13,7 @@ if i3lock --version 2>&1 | grep -q 'Raymond Li'; then
 	acc=$(grep -oP '^ACCENT_HEX="#\K[0-9a-fA-F]{6}' "$HOME/.config/rog/settings.env" 2>/dev/null); acc=${acc:-c47f1c}
 	# macOS-style: date and big thin time centred near the top, round "avatar" ring with the name at the bottom centre
 	who=$(getent passwd "$USER" | cut -d: -f5 | cut -d, -f1); who=${who:-$USER}; who=${who^}
-	rich=(--clock --indicator --radius=54 --ring-width=3
+	rich=(--clock --force-clock --indicator --radius=54 --ring-width=3
 		--time-str="%H:%M" --date-str="%A %-d %B" --time-font="Noto Sans Light" --date-font="Noto Sans Medium"
 		--time-size=150 --date-size=34 --time-pos="w/2:h*0.27" --date-pos="w/2:h*0.14"
 		--time-color=ffffffee --date-color=ffffffd9 --time-align=0 --date-align=0
