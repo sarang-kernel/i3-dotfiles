@@ -1,0 +1,9 @@
+
+   ROG Flow X13 restore image   (stable kernel only, everything offline)
+
+     rog-restore          reinstall the system from this image
+                          default: keeps /home, formats only the boot + root partitions
+     rog-restore --help   all options
+
+   The snapshot lives in /opt/rog. Nothing is changed until you confirm.
+

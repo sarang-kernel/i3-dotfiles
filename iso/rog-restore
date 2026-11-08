@@ -1,0 +1,227 @@
+#!/usr/bin/env bash
+# rog-restore: rebuild this ASUS ROG Flow X13 from the offline snapshot on this ISO.
+# Everything comes from /opt/rog on the ISO (no network needed): the package repository, /etc + system state, my configs and dev tools.
+#
+#   rog-restore                       interactive (asks before anything is erased)
+#   --mode rebuild|fresh|devices      rebuild = format boot+root, KEEP /home (default when the old partitions are found)
+#                                     fresh   = erase a whole disk (--disk /dev/nvme0n1), new layout, empty /home
+#                                     devices = I name the partitions (--esp --root [--home])
+#   --home-mode restore|stage|skip    how to treat my configs/dev tools from the snapshot (default: restore on an empty /home,
+#                                     stage on a /home that already has files: they land in ~/.rog-snapshot, nothing is overwritten)
+#   --yes                             no questions (used by the automatic test)
+#   --test                            test run in a virtual machine (small swap, serial console, self-test after first boot)
+set -Eeuo pipefail
+
+SNAP=${ROG_SNAP:-/opt/rog}
+MNT=/mnt/rog
+MODE=; DISK=; ESP=; ROOT=; HOMEDEV=; HOMEMODE=; YES=0; TEST=0
+
+say() { printf '\e[1;35m::\e[0m %s\n' "$*"; }
+warn() { printf '\e[1;33m!!\e[0m %s\n' "$*" >&2; }
+die() { printf '\e[1;31mxx\e[0m %s\n' "$*" >&2; exit 1; }
+ask() { local q=$1 d=${2:-n} a; if ((YES)); then [[ $d == y ]]; return; fi
+	read -r -p "$q [$([[ $d == y ]] && echo Y/n || echo y/N)] " a || a=; a=${a:-$d}; [[ ${a,,} == y* ]]; }
+typed() { local w=$1 a; ((YES)) && return 0; read -r -p "Type $w to continue: " a || a=; [[ $a == "$w" ]] || die "cancelled, nothing was changed"; }
+part() { [[ $1 == *[0-9] ]] && echo "${1}p$2" || echo "${1}$2"; }
+
+while (($#)); do
+	case $1 in
+	--mode) MODE=$2; shift ;; --disk) DISK=$2; shift ;; --esp) ESP=$2; shift ;; --root) ROOT=$2; shift ;; --home) HOMEDEV=$2; shift ;;
+	--home-mode) HOMEMODE=$2; shift ;; --yes) YES=1 ;; --test) TEST=1 ;;
+	-h | --help) sed -n '2,15p' "$0"; exit 0 ;;
+	*) die "unknown option $1 (see --help)" ;;
+	esac
+	shift
+done
+[[ $EUID -eq 0 ]] || die "run as root (the live ISO logs in as root)"
+[[ -r $SNAP/snapshot.info ]] || die "$SNAP/snapshot.info is missing: this is not a rog-restore ISO"
+# shellcheck disable=SC1091
+source "$SNAP/snapshot.info"
+SWAP_GB=${SWAP_GB:-18}; ROOT_GB=${ROOT_GB:-200}
+if ((TEST)); then SWAP_GB=1; ROOT_GB=40; fi
+
+umount -R "$MNT" 2>/dev/null || true
+swapoff "$MNT/swapfile" 2>/dev/null || true
+
+# ---------- 1. what to rebuild on ----------
+old_esp=$(blkid -U "$ESP_UUID" 2>/dev/null || true); old_root=$(blkid -U "$ROOT_UUID" 2>/dev/null || true); old_home=$(blkid -U "$HOME_UUID" 2>/dev/null || true)
+if [[ -z $MODE ]]; then
+	echo
+	echo "  ROG Flow X13 restore  (snapshot of $SNAPSHOT_DATE, kernel: linux, no LTS)"
+	echo
+	if [[ -n $old_esp && -n $old_root && -n $old_home ]]; then
+		echo "  1) Rebuild the system on this disk and KEEP /home   [recommended]"
+		echo "       formats only the boot partition ($old_esp) and the root partition ($old_root); $old_home (/home) is not touched"
+	else
+		echo "  1) (not available: the old partitions were not all found: boot ${old_esp:-missing}, root ${old_root:-missing}, home ${old_home:-missing})"
+	fi
+	echo "  2) Fresh disk: ERASE a whole disk, new layout, empty /home"
+	echo "  3) Quit"
+	read -r -p "Choose 1-3: " c || c=3
+	case $c in 1) MODE=rebuild ;; 2) MODE=fresh ;; *) exit 0 ;; esac
+fi
+
+case $MODE in
+rebuild)
+	[[ -n $old_esp && -n $old_root && -n $old_home ]] || die "rebuild needs the old boot, root and home partitions (UUIDs in $SNAP/snapshot.info); use --mode devices"
+	ESP=$old_esp; ROOT=$old_root; HOMEDEV=$old_home ;;
+devices)
+	[[ -b $ESP && -b $ROOT ]] || die "--mode devices needs --esp and --root block devices"
+	[[ -z $HOMEDEV || -b $HOMEDEV ]] || die "--home is not a block device" ;;
+fresh)
+	if [[ -z $DISK ]]; then
+		echo; lsblk -dpno NAME,SIZE,MODEL,TRAN,TYPE | awk '$NF=="disk"'
+		read -r -p "Disk to ERASE completely (e.g. /dev/nvme0n1): " DISK || DISK=
+	fi
+	[[ -b $DISK ]] || die "$DISK is not a disk"
+	live=$(findmnt -no SOURCE /run/archiso/bootmnt 2>/dev/null || true); [[ -z $live ]] || { lb=$(lsblk -no PKNAME "$live" 2>/dev/null | head -1); [[ $DISK != "/dev/$lb" ]] || die "$DISK is the ISO's own medium"; }
+	warn "EVERYTHING on $DISK will be erased, including /home:"; lsblk -o NAME,SIZE,FSTYPE,LABEL,MOUNTPOINTS "$DISK"
+	typed "${DISK##*/}" ;;
+*) die "unknown mode $MODE" ;;
+esac
+
+# a UUID is reusable when no OTHER device carries it
+uuid_ok() { local d; d=$(blkid -U "$1" 2>/dev/null || true); [[ -z $d || $(readlink -f "$d") == "$(readlink -f "$2")" ]]; }
+# ---------- 2. partitions ----------
+FRESH_HOME=0
+if [[ $MODE == fresh ]]; then
+	say "partitioning $DISK: 1 GB boot, $ROOT_GB GB root, rest /home"
+	wipefs -af "$DISK" >/dev/null; sgdisk --zap-all "$DISK" >/dev/null
+	sgdisk -n1:0:+1G -t1:ef00 -c1:ESP -n2:0:+"${ROOT_GB}G" -t2:8300 -c2:root -n3:0:0 -t3:8300 -c3:home "$DISK" >/dev/null
+	partprobe "$DISK"; udevadm settle; sleep 1
+	ESP=$(part "$DISK" 1); ROOT=$(part "$DISK" 2); HOMEDEV=$(part "$DISK" 3)
+	homeopt=(); uuid_ok "$HOME_UUID" "$HOMEDEV" && homeopt=(-U "$HOME_UUID")
+	mkfs.ext4 -qF -L home "${homeopt[@]}" "$HOMEDEV"; FRESH_HOME=1
+else
+	warn "will FORMAT: boot $ESP and root $ROOT. /home ${HOMEDEV:-(none given)} is kept as it is."; lsblk -o NAME,SIZE,FSTYPE,LABEL,UUID "$ESP" "$ROOT"
+	typed ERASE
+fi
+say "formatting boot (FAT32) and root (ext4)"
+# keep the old UUIDs when they are free (see uuid_ok), so the next restore still recognises this machine
+espopt=(); uuid_ok "$ESP_UUID" "$ESP" && espopt=(-i "${ESP_UUID//-/}")
+rootopt=(); uuid_ok "$ROOT_UUID" "$ROOT" && rootopt=(-U "$ROOT_UUID")
+mkfs.fat -F32 -n ESP "${espopt[@]}" "$ESP" >/dev/null
+mkfs.ext4 -qF -L root "${rootopt[@]}" "$ROOT"
+udevadm settle
+
+mount -o noatime,lazytime "$ROOT" "$MNT" 2>/dev/null || { mkdir -p "$MNT"; mount -o noatime,lazytime "$ROOT" "$MNT"; }
+mkdir -p "$MNT/boot" "$MNT/home"
+mount -o fmask=0022,dmask=0022 "$ESP" "$MNT/boot"
+[[ -z $HOMEDEV ]] || mount -o noatime,lazytime "$HOMEDEV" "$MNT/home"
+if [[ -z $HOMEMODE ]]; then
+	if ((FRESH_HOME)) || [[ -z $(ls -A "$MNT/home" 2>/dev/null | grep -v '^lost+found$' || true) ]]; then HOMEMODE=restore; else HOMEMODE=stage; fi
+fi
+say "home: $HOMEMODE ($( [[ $HOMEMODE == restore ]] && echo 'configs and dev tools go straight into /home' || echo 'existing files are never overwritten' ))"
+
+# ---------- 3. swap file (hibernation needs it) ----------
+say "creating the ${SWAP_GB} GB swap file"
+mkswap -U clear --size "${SWAP_GB}G" --file "$MNT/swapfile" >/dev/null
+chmod 600 "$MNT/swapfile"
+
+# ---------- 4. packages (offline) ----------
+say "installing $(wc -l <"$SNAP/lists/native.txt") + $(wc -l <"$SNAP/lists/aur.txt") packages from the ISO (a few minutes, DKMS builds the NVIDIA module at the end)"
+# shellcheck disable=SC2046
+pacstrap -C "$SNAP/offline.conf" -K -M "$MNT" $(cat "$SNAP/lists/native.txt" "$SNAP/lists/aur.txt")
+# same dependency flags as before: only what I installed myself is "explicit"
+# (the lists go in /root: arch-chroot mounts a fresh tmpfs over /tmp, which would hide them)
+cat "$SNAP/lists/native.txt" "$SNAP/lists/aur.txt" | sort -u >"$MNT/root/all.txt"; sort -u "$SNAP/lists/explicit-all.txt" >"$MNT/root/exp.txt"
+arch-chroot "$MNT" bash -c 'pacman -D --asdeps $(comm -23 /root/all.txt /root/exp.txt) >/dev/null; pacman -D --asexplicit $(comm -12 /root/all.txt /root/exp.txt) >/dev/null; rm -f /root/all.txt /root/exp.txt'
+
+# pacman copied the packages into the new system's cache while installing; they stay on the ISO, so do not keep a second 7 GB copy
+rm -f "$MNT"/var/cache/pacman/pkg/*.pkg.tar.* 2>/dev/null || true
+
+# ---------- 5. system configuration ----------
+say "restoring /etc and system state"
+tar --zstd -xpf "$SNAP/overlay.tar.zst" -C "$MNT" --numeric-owner --keep-directory-symlink
+genfstab -U "$MNT" | grep -v '^$' >"$MNT/etc/fstab"
+grep -q '^/swapfile' "$MNT/etc/fstab" || printf '/swapfile\tnone\tswap\tdefaults\t0 0\n' >>"$MNT/etc/fstab"
+ln -sf "/usr/share/zoneinfo/${TZ:-Asia/Kolkata}" "$MNT/etc/localtime"
+
+ROOT_NEW_UUID=$(blkid -s UUID -o value "$ROOT")
+OFFSET=$(filefrag -v "$MNT/swapfile" | awk '$1=="0:"{print substr($4,1,length($4)-2)}')
+[[ $OFFSET =~ ^[0-9]+$ ]] || die "cannot read the swap file offset (needed for hibernation)"
+G=$MNT/etc/default/grub
+[[ -f $G ]] || die "etc/default/grub is missing from the snapshot"
+sed -i -E "s/^GRUB_DEFAULT=.*/GRUB_DEFAULT=0/; s#resume=UUID=[0-9a-fA-F-]+#resume=UUID=$ROOT_NEW_UUID#; s/resume_offset=[0-9]+/resume_offset=$OFFSET/" "$G"
+((TEST)) && sed -i -E 's/ quiet//; s/^(GRUB_CMDLINE_LINUX_DEFAULT=")/\1console=ttyS0,115200 /' "$G"
+[[ ! -f $MNT/etc/initcpio/conf.d/resume.conf ]] || sed -i -E "s/^RESUME_OFFSET=.*/RESUME_OFFSET=$OFFSET/" "$MNT/etc/initcpio/conf.d/resume.conf"
+
+say "user $USERNAME (uid $USER_UID), passwords, groups"
+chroot_do() { arch-chroot "$MNT" "$@"; }
+chroot_do bash -c "getent group $USERNAME >/dev/null || groupadd -g $USER_UID $USERNAME; id $USERNAME >/dev/null 2>&1 || useradd -u $USER_UID -g $USERNAME -G wheel -s /bin/bash -d /home/$USERNAME $USERNAME"
+chroot_do bash -c "usermod -aG wheel $USERNAME; getent group video >/dev/null && getent passwd greeter >/dev/null && usermod -aG video greeter || true"
+mkdir -p "$MNT/home/$USERNAME"; chown "$USER_UID:$USER_UID" "$MNT/home/$USERNAME"; chmod 700 "$MNT/home/$USERNAME" 2>/dev/null || true
+chroot_do bash -c "locale-gen >/dev/null; hwclock --systohc 2>/dev/null || true"
+
+# secrets: root-side (host keys, Wi-Fi, Bluetooth pairings, password hashes) always; home-side (ssh, gnupg) follows --home-mode
+SECR=$(mktemp -d); tar --zstd -xpf "$SNAP/secrets.tar.zst" -C "$SECR" --numeric-owner
+if ((TEST)); then echo "$USERNAME:rogtest" | chroot_do chpasswd; echo "TEST password for $USERNAME: rogtest"
+else
+	for u in "$USERNAME" root; do
+		h=$(awk -F: -v u="$u" '$1==u{print $2}' "$SECR/shadow-lines" 2>/dev/null || true)
+		if [[ -n $h ]]; then chroot_do usermod -p "$h" "$u"; elif [[ $u == "$USERNAME" ]]; then say "set the password for $USERNAME"; chroot_do passwd "$USERNAME"; fi
+	done
+fi
+for d in etc/ssh var/lib/iwd var/lib/bluetooth etc/NetworkManager; do
+	[[ -d $SECR/$d ]] && { mkdir -p "$MNT/$d"; cp -a "$SECR/$d/." "$MNT/$d/"; }
+done
+
+# ---------- 6. my configs and dev tools ----------
+case $HOMEMODE in
+restore) say "restoring configs + dev tools into /home/$USERNAME"
+	tar --zstd -xpf "$SNAP/home-config.tar.zst" -C "$MNT/home/$USERNAME" --numeric-owner
+	[[ -d $SECR/home ]] && cp -a "$SECR/home/." "$MNT/home/$USERNAME/" ;;
+stage) D=$MNT/home/$USERNAME/.rog-snapshot; say "staging the snapshot in ~/.rog-snapshot (copy what you want from there)"
+	mkdir -p "$D/secrets"; tar --zstd -xpf "$SNAP/home-config.tar.zst" -C "$D" --numeric-owner
+	[[ -d $SECR/home ]] && cp -a "$SECR/home/." "$D/secrets/"
+	chown -R "$USER_UID:$USER_UID" "$D" ;;
+skip) say "home snapshot skipped" ;;
+*) die "bad --home-mode $HOMEMODE" ;;
+esac
+rm -rf "$SECR"
+mkdir -p "$MNT/home/$USERNAME"; chown "$USER_UID:$USER_UID" "$MNT/home/$USERNAME"
+
+# ---------- 7. boot ----------
+if ((TEST)); then
+	mkdir -p "$MNT/usr/local/lib/rog"; install -m755 "$SNAP/selftest.sh" "$MNT/usr/local/lib/rog/selftest.sh"
+	cat >"$MNT/etc/systemd/system/rog-selftest.service" <<'U'
+[Unit]
+Description=rog-restore self-test (test runs only)
+[Service]
+Type=oneshot
+ExecStart=/usr/local/lib/rog/selftest.sh
+StandardOutput=journal+console
+[Install]
+WantedBy=multi-user.target
+U
+	chroot_do systemctl enable rog-selftest.service >/dev/null
+fi
+say "boot image + bootloader"
+chroot_do mkinitcpio -P
+chroot_do grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=Arch --removable
+chroot_do grub-mkconfig -o /boot/grub/grub.cfg
+{ echo "restored by rog-restore on $(date -Is) from snapshot $SNAPSHOT_DATE"; } >"$MNT/etc/rog-restore-info"
+
+say "checks"
+fail=0
+chk() { if eval "$2"; then printf '  ok   %s\n' "$1"; else printf '  FAIL %s\n' "$1"; fail=1; fi; }
+chk "kernel is the stable one, no LTS" '[[ -e $MNT/boot/vmlinuz-linux && ! -e $MNT/boot/vmlinuz-linux-lts ]]'
+LSI=$(mktemp); lsinitcpio "$MNT/boot/initramfs-linux.img" >"$LSI" 2>/dev/null || true   # to a file: a pipe into grep -q breaks under pipefail
+chk "boot image has the amdgpu driver" 'grep -q amdgpu.ko "$LSI"'
+chk "boot image has the resume hook" 'grep -q hooks/resume "$LSI"'
+chk "grub entry for linux" 'grep -q "vmlinuz-linux" "$MNT/boot/grub/grub.cfg"'
+chk "grub resume parameters" 'grep -q "resume_offset=$OFFSET" "$MNT/boot/grub/grub.cfg"'
+chk "bootloader on the ESP" '[[ -e $MNT/boot/EFI/BOOT/BOOTX64.EFI ]]'
+chk "package cache is empty" '[[ -z $(ls "$MNT"/var/cache/pacman/pkg 2>/dev/null) ]]'
+chk "no LTS packages" '! arch-chroot "$MNT" pacman -Q linux-lts >/dev/null 2>&1'
+chk "greetd enabled" '[[ -L $MNT/etc/systemd/system/display-manager.service ]]'   # -L: the link points into the new system, so it dangles from here
+chk "fstab has root, boot, swap" 'grep -qE "[[:space:]]/[[:space:]]" "$MNT/etc/fstab" && grep -qE "[[:space:]]/boot[[:space:]]" "$MNT/etc/fstab" && grep -q swapfile "$MNT/etc/fstab"'
+chk "sudo rule for $USERNAME" 'grep -rqE "^$USERNAME[[:space:]]" "$MNT"/etc/sudoers.d "$MNT"/etc/sudoers'
+chk "install reasons restored (few explicit packages, not all)" '[[ $(arch-chroot "$MNT" pacman -Qqe | wc -l) -lt 400 ]]'
+# pacman-key leaves a gpg-agent behind that keeps the new system busy: stop it, then unmount (lazily if something still holds on)
+gpgconf --homedir "$MNT/etc/pacman.d/gnupg" --kill all >/dev/null 2>&1 || true
+fuser -km "$MNT" >/dev/null 2>&1 || true; sleep 1
+sync; umount -R "$MNT" 2>/dev/null || { sleep 2; umount -Rl "$MNT"; }
+((fail)) && warn "some checks failed: read the lines above before rebooting" || say "done. Remove the USB stick and reboot; the first boot rebuilds nothing, it is the finished system."
+((YES)) || { ask "Reboot now?" y && reboot; }
+exit 0

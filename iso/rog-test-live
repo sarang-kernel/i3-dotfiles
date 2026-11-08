@@ -1,0 +1,12 @@
+#!/bin/bash
+# automatic test hook of the ISO: only runs when the kernel command line has rog_test=<scenario> (qemu tests), never on real hardware
+sc=$(sed -nE 's/.*rog_test=([a-z]+).*/\1/p' /proc/cmdline)
+echo "ROG-TEST scenario=$sc"
+case $sc in
+fresh) rog-restore --test --yes --mode fresh --disk /dev/vda --home-mode restore || echo "ROG-TEST restore exit $?"
+ ;;
+rebuild) rog-restore --test --yes --mode rebuild --home-mode stage || echo "ROG-TEST restore exit $?" ;;
+*) echo "unknown scenario"; exit 1 ;;
+esac
+echo "ROG-TEST DONE"
+sleep 2; systemctl poweroff

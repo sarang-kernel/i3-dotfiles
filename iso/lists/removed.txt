@@ -1,0 +1,8 @@
+btop
+girara
+linux-lts
+linux-lts-headers
+poppler-glib
+yazi
+zathura
+zathura-pdf-poppler

@@ -1,0 +1,10 @@
+blueberry
+ferdium
+gnome-bluetooth
+google-chrome
+i3lock-color
+localsend-bin
+md-viewer-git
+xautolock
+yay
+zen-browser-bin

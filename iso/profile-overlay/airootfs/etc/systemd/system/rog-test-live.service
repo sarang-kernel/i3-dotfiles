@@ -1,0 +1,10 @@
+[Unit]
+Description=rog-restore automatic test run (only when the kernel command line has rog_test=...)
+ConditionKernelCommandLine=rog_test
+After=local-fs.target systemd-udev-settle.service
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/rog-test-live
+StandardOutput=journal+console
+[Install]
+WantedBy=multi-user.target

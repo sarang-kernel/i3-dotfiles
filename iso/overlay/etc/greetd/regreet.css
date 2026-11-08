@@ -1,0 +1,61 @@
+/* warm amber / chalk login screen */
+@define-color chalk #eee9e0;
+@define-color amber #c47f1c;
+@define-color ink rgba(20, 17, 15, 0.80);
+
+window { color: @chalk; }
+window.background { background: transparent; }
+
+/* frames are only containers; the card look goes on their content, so the bare clock and the empty message strip stay clean */
+frame, frame.background { background: none; border: none; box-shadow: none; padding: 0; }
+frame > border, frame.background > border { background: none; border: none; box-shadow: none; padding: 0; }
+frame grid, frame > grid {
+  background: @ink;
+  border: 1px solid rgba(238, 233, 224, 0.10);
+  border-radius: 26px;
+  padding: 28px 32px;
+  box-shadow: none;
+}
+label { color: @chalk; }
+
+/* fields */
+entry, dropdown > button, combobox button, button.image-button {
+  background: rgba(238, 233, 224, 0.07);
+  color: @chalk;
+  border: 1px solid rgba(238, 233, 224, 0.12);
+  border-radius: 14px;
+  box-shadow: none;
+  min-height: 38px;
+  transition: all 160ms ease;
+}
+entry:focus, dropdown > button:focus, button.image-button:focus {
+  border-color: @amber;
+  box-shadow: 0 0 0 3px rgba(196, 127, 28, 0.35);
+}
+entry:hover, dropdown > button:hover, button.image-button:hover { background: rgba(238, 233, 224, 0.12); }
+popover contents, popover.background contents { background: #1d1914; border-radius: 14px; border: 1px solid rgba(238,233,224,.12); }
+popover modelbutton, popover row { border-radius: 10px; }
+popover row:selected, popover modelbutton:hover { background: rgba(196, 127, 28, 0.35); }
+
+/* the main action */
+button.suggested-action {
+  background: @amber; color: #14110f; font-weight: 600;
+  border: none; border-radius: 14px; min-height: 40px; padding: 0 26px;
+  box-shadow: none;
+  transition: all 160ms ease;
+}
+button.suggested-action:hover { background: #d9902a; }
+button.suggested-action:active { background: #a96d17; }
+
+/* reboot / power off: quiet, no red */
+button.destructive-action {
+  background: rgba(20, 17, 15, 0.55); color: rgba(238, 233, 224, 0.82);
+  border: 1px solid rgba(238, 233, 224, 0.14); border-radius: 14px;
+  min-height: 36px; padding: 0 18px; box-shadow: none;
+  transition: all 160ms ease;
+}
+button.destructive-action:hover { background: rgba(238, 233, 224, 0.16); color: @chalk; }
+
+/* clock at the top */
+frame > label, frame > border > label { font-size: 300%; font-weight: 200; letter-spacing: 2px; padding: 26px; text-shadow: 0 2px 18px rgba(0,0,0,.65); }
+label.error { color: #e8a07a; }

@@ -1,0 +1,9 @@
+[Unit]
+Description=Enable WoWLAN magic-packet wake on wlan0
+After=network.target sys-subsystem-net-devices-wlan0.device
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/iw phy phy0 wowlan enable magic-packet
+[Install]
+WantedBy=multi-user.target sleep.target

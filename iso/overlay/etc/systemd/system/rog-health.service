@@ -1,0 +1,6 @@
+[Unit]
+Description=SSD health report (Settings -> System)
+[Service]
+Type=oneshot
+Nice=19
+ExecStart=/usr/local/lib/rog/health.sh
