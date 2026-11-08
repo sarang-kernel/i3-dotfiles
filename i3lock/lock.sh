@@ -5,7 +5,7 @@
 img=$HOME/.cache/lock-bg.png
 base=(--nofork --ignore-empty-password --show-failed-attempts -c 14110f)
 [[ -f $img ]] && base+=(-i "$img")
-if i3lock --version 2>&1 | grep -qi color; then
+if i3lock --version 2>&1 | grep -q 'Raymond Li'; then
 	acc=$(grep -oP '^ACCENT_HEX="#\K[0-9a-fA-F]{6}' "$HOME/.config/rog/settings.env" 2>/dev/null); acc=${acc:-c47f1c}
 	rich=(--clock --indicator --radius=110 --ring-width=5
 		--time-str="%H:%M" --date-str="%A, %d %B" --time-font="Noto Sans" --date-font="Noto Sans" --time-size=52 --date-size=17

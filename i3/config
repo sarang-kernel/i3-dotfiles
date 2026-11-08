@@ -134,7 +134,7 @@ bindsym $mod+q kill
 # bindsym $mod+d exec rofi -show drun 
 
 # Powermenu
-bindsym $mod+Escape exec --no-startup-id bash -lc '~/.config/rofi/powermenu.sh'
+bindsym $mod+Escape exec --no-startup-id python3 ~/.config/scripts/power-menu.py
 
 
 # dmenu has been replaced by spotlight
@@ -390,3 +390,6 @@ exec_always --no-startup-id python3 ~/.config/scripts/display-agent.py
 
 # rog-tune: wallpaper-timer — optional automatic wallpaper change (Settings -> Wallpaper)
 exec_always --no-startup-id ~/.config/scripts/wallpaper-timer.sh
+
+# rog-tune: power — Super+Escape opens the power menu (lock, log out, sleep, hibernate, restart, shut down)
+for_window [class="^RogPower$"] floating enable, border none, move position center

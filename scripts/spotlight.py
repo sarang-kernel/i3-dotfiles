@@ -4,7 +4,7 @@
 #   Ctrl+J/K or Ctrl+N/P or Up/Down move   Alt+1..9 pick a row   Tab next row
 #   prefixes:  =2+2 (maths)   c word (clipboard history)   > cmd (run a command)   w word (windows only)
 # Searches while you type (plocate for files, qalc for maths). Closes itself when it loses focus. Nothing stays resident.
-import json, math, os, re, shlex, subprocess, sys, time
+import json, math, os, re, shlex, subprocess, sys, threading, time
 from pathlib import Path
 import gi
 gi.require_version("Gtk", "3.0"); gi.require_version("Gdk", "3.0")
@@ -25,7 +25,8 @@ def sh(cmd, timeout=1.0):
         return ""
 
 def spawn(cmd):
-    subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, stdin=subprocess.DEVNULL, start_new_session=True)
+    p = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, stdin=subprocess.DEVNULL, start_new_session=True)
+    threading.Thread(target=p.wait, daemon=True).start()     # reap it when it ends (no <defunct> children of this long-lived process)
 
 def copy(text):
     p = subprocess.Popen(["xclip", "-selection", "clipboard"], stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
