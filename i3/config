@@ -39,7 +39,7 @@ bindsym $mod+Shift+y exec --no-startup-id sh -c "$HOME/.config/wallpaper-config/
 font pango:Meslo LGM Nerd Font 11
 
 #Autorotate monitor
-exec --no-startup-id /home/sarang/.config/scripts/autorotate.sh
+exec_always --no-startup-id /home/sarang/.config/scripts/autorotate.sh
 
 # Pen setup 
 exec --no-startup-id /home/sarang/.config/scripts/pen-setup.sh

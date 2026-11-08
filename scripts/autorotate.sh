@@ -24,13 +24,32 @@ apply() {
 	bottom-up) r=inverted m="-1 0 1 0 -1 1 0 0 1" ;;
 	*) return ;;
 	esac
+	xrandr --output "$SCREEN" --rotate "$r" || { logger -t autorotate "xrandr refused $r" 2>/dev/null; return; }
 	CURRENT=$1
-	xrandr --output "$SCREEN" --rotate "$r"
 	xinput list --name-only | grep -iE 'touchscreen|stylus|pen|^ELAN' | grep -viE 'touchpad|keyboard|mouse' |
 		while read -r d; do xinput set-prop "$d" "Coordinate Transformation Matrix" $m; done
 	~/.config/scripts/nightlight.sh reapply 2>/dev/null   # a rotation can reset the tint
 }
 # the first line is "Has accelerometer (orientation: X ...)", later ones are "orientation changed: X"
-monitor-sensor --accel | while read -r line; do
-	[[ $line =~ orientation(\ changed)?:\ ([a-z-]+) ]] && apply "${BASH_REMATCH[2]}"
+# monitor-sensor stays alive and silent when the sensor claim is refused (it only warns on stderr), and a claim made before the session is
+# active is refused. So watch for that, and restart it whenever it fails or exits: rotation must not depend on one attempt at login.
+pid=
+trap 'exit 0' TERM INT
+trap '[[ -n $pid ]] && kill "$pid" 2>/dev/null' EXIT
+delay=2
+while :; do
+	exec 3< <(exec monitor-sensor --accel 2>&1)
+	pid=$!
+	while read -r -u3 line; do
+		if [[ $line == *"Failed to claim"* ]]; then
+			logger -t autorotate "sensor claim refused, retrying in ${delay}s" 2>/dev/null
+			break
+		fi
+		if [[ $line =~ orientation(\ changed)?:\ ([a-z-]+) ]]; then delay=2; apply "${BASH_REMATCH[2]}"; fi
+	done
+	exec 3<&-
+	kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null
+	CURRENT=
+	sleep "$delay"
+	((delay < 30)) && delay=$((delay * 2))
 done

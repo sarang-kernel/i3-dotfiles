@@ -12,6 +12,7 @@ It started as "I'll just tidy the config a bit" and then I kept going. You have 
 | `apps/spotlight/` | a copy of my standalone Spotlight repo (launcher, power menu, installer). The live copies sit in `scripts/` |
 | `i3lock/lock.sh` | my lock screen: blurred wallpaper, plus a big thin clock and a round ring with my name on it if `i3lock-color` is installed (plain `i3lock` if not) |
 | `rog-tune/` | the root-side tuning. `rog-tune.sh` is a dry run unless I say `--apply` (and `--undo` exists for moments of doubt); `rog-lean-session.sh` is the user-level installer. Highlights: the **greetd + ReGreet** login screen (warm theme, rotates with the accelerometer), a restore point before every pacman transaction, power saving on battery, kernel and GRUB options |
+| `iso/` | the recipe for my restore ISO: a bootable Arch installer that rebuilds this laptop offline, with `rog-restore` as the installer. The ISO itself is too big for GitHub; see `iso/README.md` |
 | `rog/settings.env` | every setting my scripts read. The Settings app writes it, so I rarely touch it by hand |
 
 ## Installing it (on a laptop that isn't mine: good luck and godspeed)

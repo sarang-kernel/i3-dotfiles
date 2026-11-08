@@ -500,14 +500,16 @@ ac_online() {
 }
 set_refresh() { # any rate from 60 to 165 Hz: 60 and 165 are the panel's own modes; the rest use the same timings at another pixel clock
 	local hz=$1 name clk
-	if [[ $hz == 60 || $hz == 165 ]]; then xrandr --output eDP-1 --mode 2560x1600 --rate "$hz" 2>/dev/null && return 0; fi
+	# the panel is eDP-1 or eDP-2 depending on which GPU driver registered first: always look it up
+	local panel; panel=$(xrandr --current | awk '/^eDP[^ ]* connected/{print $1; exit}'); panel=${panel:-eDP-1}
+	if [[ $hz == 60 || $hz == 165 ]]; then xrandr --output "$panel" --mode 2560x1600 --rate "$hz" 2>/dev/null && return 0; fi
 	name=2560x1600_$hz
 	if ! xrandr | grep -q "^   $name "; then
 		clk=$(awk -v r="$hz" 'BEGIN{printf "%.3f", 2735*1732*r/1e6}')
 		xrandr --newmode "$name" "$clk" 2560 2608 2640 2735 1600 1603 1609 1732 -HSync -VSync 2>/dev/null
-		xrandr --addmode eDP-1 "$name" 2>/dev/null
+		xrandr --addmode "$panel" "$name" 2>/dev/null
 	fi
-	xrandr --output eDP-1 --mode "$name" 2>/dev/null || xrandr --output eDP-1 --mode 2560x1600 --rate 60
+	xrandr --output "$panel" --mode "$name" 2>/dev/null || xrandr --output "$panel" --mode 2560x1600 --rate 60
 }
 timers() { # screen lock / blank timers by power source; caffeine (a state file) switches them off
 	command -v xset >/dev/null || return 0
@@ -912,15 +914,34 @@ apply() {
 	bottom-up) r=inverted m="-1 0 1 0 -1 1 0 0 1" ;;
 	*) return ;;
 	esac
+	xrandr --output "$SCREEN" --rotate "$r" || { logger -t autorotate "xrandr refused $r" 2>/dev/null; return; }
 	CURRENT=$1
-	xrandr --output "$SCREEN" --rotate "$r"
 	xinput list --name-only | grep -iE 'touchscreen|stylus|pen|^ELAN' | grep -viE 'touchpad|keyboard|mouse' |
 		while read -r d; do xinput set-prop "$d" "Coordinate Transformation Matrix" $m; done
 	~/.config/scripts/nightlight.sh reapply 2>/dev/null   # a rotation can reset the tint
 }
 # the first line is "Has accelerometer (orientation: X ...)", later ones are "orientation changed: X"
-monitor-sensor --accel | while read -r line; do
-	[[ $line =~ orientation(\ changed)?:\ ([a-z-]+) ]] && apply "${BASH_REMATCH[2]}"
+# monitor-sensor stays alive and silent when the sensor claim is refused (it only warns on stderr), and a claim made before the session is
+# active is refused. So watch for that, and restart it whenever it fails or exits: rotation must not depend on one attempt at login.
+pid=
+trap 'exit 0' TERM INT
+trap '[[ -n $pid ]] && kill "$pid" 2>/dev/null' EXIT
+delay=2
+while :; do
+	exec 3< <(exec monitor-sensor --accel 2>&1)
+	pid=$!
+	while read -r -u3 line; do
+		if [[ $line == *"Failed to claim"* ]]; then
+			logger -t autorotate "sensor claim refused, retrying in ${delay}s" 2>/dev/null
+			break
+		fi
+		if [[ $line =~ orientation(\ changed)?:\ ([a-z-]+) ]]; then delay=2; apply "${BASH_REMATCH[2]}"; fi
+	done
+	exec 3<&-
+	kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null
+	CURRENT=
+	sleep "$delay"
+	((delay < 30)) && delay=$((delay * 2))
 done
 RROT
 	ADD+=("$SD/autorotate.sh|$W/autorotate.sh")

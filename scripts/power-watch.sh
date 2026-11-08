@@ -22,14 +22,16 @@ ac_online() {
 }
 set_refresh() { # any rate from 60 to 165 Hz: 60 and 165 are the panel's own modes; the rest use the same timings at another pixel clock
 	local hz=$1 name clk
-	if [[ $hz == 60 || $hz == 165 ]]; then xrandr --output eDP-1 --mode 2560x1600 --rate "$hz" 2>/dev/null && return 0; fi
+	# the panel is eDP-1 or eDP-2 depending on which GPU driver registered first: always look it up
+	local panel; panel=$(xrandr --current | awk '/^eDP[^ ]* connected/{print $1; exit}'); panel=${panel:-eDP-1}
+	if [[ $hz == 60 || $hz == 165 ]]; then xrandr --output "$panel" --mode 2560x1600 --rate "$hz" 2>/dev/null && return 0; fi
 	name=2560x1600_$hz
 	if ! xrandr | grep -q "^   $name "; then
 		clk=$(awk -v r="$hz" 'BEGIN{printf "%.3f", 2735*1732*r/1e6}')
 		xrandr --newmode "$name" "$clk" 2560 2608 2640 2735 1600 1603 1609 1732 -HSync -VSync 2>/dev/null
-		xrandr --addmode eDP-1 "$name" 2>/dev/null
+		xrandr --addmode "$panel" "$name" 2>/dev/null
 	fi
-	xrandr --output eDP-1 --mode "$name" 2>/dev/null || xrandr --output eDP-1 --mode 2560x1600 --rate 60
+	xrandr --output "$panel" --mode "$name" 2>/dev/null || xrandr --output "$panel" --mode 2560x1600 --rate 60
 }
 timers() { # screen lock / blank timers by power source; caffeine (a state file) switches them off
 	command -v xset >/dev/null || return 0

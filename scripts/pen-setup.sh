@@ -2,7 +2,7 @@
 
 PEN="ELAN9008:00 04F3:40FD Stylus"
 TOUCH="ELAN9008:00 04F3:40FD"
-SCREEN="eDP-1"
+SCREEN="$(xrandr --current | awk '/^eDP[^ ]* connected/{print $1; exit}')"; SCREEN=${SCREEN:-eDP-1}   # eDP-1 or eDP-2, depends on GPU driver order
 
 log() {
 	echo "[pen-setup] $1"
