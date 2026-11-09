@@ -367,7 +367,6 @@ exec_always --no-startup-id ~/.config/scripts/autocaffeine.sh
 
 # rog-tune: settings — Super+comma opens the settings window (also in Spotlight: type "settings")
 bindsym $mod+comma exec --no-startup-id ~/.config/scripts/rog-ui.sh settings
-for_window [class="^RogSettings$"] fullscreen enable
 
 # rog-tune: spotlight — Spotlight and Settings live in one resident process (started once; opening is instant)
 exec_always --no-startup-id ~/.config/scripts/rog-ui.sh start

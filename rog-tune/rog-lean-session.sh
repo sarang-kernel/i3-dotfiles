@@ -962,7 +962,7 @@ E
 for_window [class="^rog-sync$"] floating enable, resize set 1100 640, move position center
 E
 	fi
-	sed -i -E 's|^for_window \[class="\^RogSettings\$"\].*$|for_window [class="^RogSettings$"] fullscreen enable|' "$W/i3"   # Settings is a full-screen window now
+	sed -i -E '/^for_window \[class="\^RogSettings\$"\]/d' "$W/i3"   # Settings opens like any other app (tiled)
 	if ! grep -q "RogAlarm" "$W/i3"; then cat >>"$W/i3" <<'E'
 
 # rog-tune: alarm — a Spotlight timer or reminder rings in a centred box that stays until dismissed
@@ -980,7 +980,6 @@ E
 
 # rog-tune: settings — Super+comma opens the settings window (also in Spotlight: type "settings")
 bindsym $mod+comma exec --no-startup-id ~/.config/scripts/rog-ui.sh settings
-for_window [class="^RogSettings$"] fullscreen enable
 E
 	fi
 	cat >"$W/settings.py" <<'RSET'
