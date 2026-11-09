@@ -4,6 +4,15 @@ My desktop, lovingly over-engineered. This is the i3 setup I live in on an **ASU
 
 It started as "I'll just tidy the config a bit" and then I kept going. You have been warned.
 
+## What it looks like
+![My desktop: kitty and Neovim tiled over the blurred wallpaper](docs/img/desktop.png)
+*Tiled kitty and Neovim on the amber-and-dusk look, with the bar along the bottom (cropped out here, because it knows my Wi-Fi name).*
+
+| My Settings app | My Spotlight |
+|---|---|
+| ![The GTK4 Settings app on the Display page](docs/img/settings.png) | ![Spotlight searching for "kitty"](docs/img/spotlight.png) |
+| One window for display, power, input, sound, wallpaper, the bar and backups. It writes `rog/settings.env`, so I never have to. | Apps, open windows and files in one box. It opens in about 20 ms. |
+
 ## What's in here
 | Folder | What it is |
 |---|---|
