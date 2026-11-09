@@ -5,13 +5,28 @@ My desktop, lovingly over-engineered. This is the i3 setup I live in on an **ASU
 It started as "I'll just tidy the config a bit" and then I kept going. You have been warned.
 
 ## What it looks like
-![My desktop: kitty and Neovim tiled over the blurred wallpaper](docs/img/desktop.png)
-*Tiled kitty and Neovim on the amber-and-dusk look, with the bar along the bottom (cropped out here, because it knows my Wi-Fi name).*
+![A short screen recording: Spotlight finds apps, does maths, shows emoji, previews files, then the layout flips between tabbed and stacked](docs/img/demo.gif)
+*About a minute of me poking at everything. Spotlight first, then the i3 layouts and the Settings app.*
 
-| My Settings app | My Spotlight |
+Every shot here was taken on a throwaway virtual screen running the same configs, so none of my real windows (or my Wi-Fi name) sneak into the pictures.
+
+![My desktop: Neovim on the left, fastfetch and a git log tiled on the right, bar along the bottom](docs/img/desktop.png)
+*The everyday layout: tiled, keyboard-driven, and the bar stays out of the way at the bottom.*
+
+| Tabbed (`Super+W`) | Stacked (`Super+S`) |
 |---|---|
-| ![The GTK4 Settings app on the Display page](docs/img/settings.png) | ![Spotlight searching for "kitty"](docs/img/spotlight.png) |
-| One window for display, power, input, sound, wallpaper, the bar and backups. It writes `rog/settings.env`, so I never have to. | Apps, open windows and files in one box. It opens in about 20 ms. |
+| ![Two terminals as tabs in one tile](docs/img/tabbed.png) | ![Two terminals stacked with title bars](docs/img/stacking.png) |
+
+| My Settings app | The power menu (`Super+Escape`) |
+|---|---|
+| ![Settings opens tiled like any other window](docs/img/settings.png) | ![Lock, log out, sleep, hibernate, restart, shut down as a row of tiles](docs/img/power.png) |
+| One window for display, power, input, sound, wallpaper, the bar and backups. It opens tiled like everything else. | Destructive buttons need a second Enter, so I cannot nuke my session by accident. |
+
+![The lock screen: blurred wallpaper, big thin clock, a round ring with my name](docs/img/lock.png)
+*The lock screen. Blurred wallpaper, a big thin clock, a round ring with my name on it.*
+
+![Spotlight on the desktop, searching for settings](docs/img/spotlight.png)
+*My Spotlight on top of all that. Its own repo has the full tour: [sarang-kernel/spotlight](https://github.com/sarang-kernel/spotlight).*
 
 ## What's in here
 | Folder | What it is |
