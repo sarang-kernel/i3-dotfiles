@@ -1,9 +1,0 @@
-[Unit]
-Description=stall-watch: logs the moments the machine stalls
-
-[Service]
-ExecStart=/usr/bin/python3 %h/.local/bin/stall-watch.py
-Restart=always
-
-[Install]
-WantedBy=default.target
