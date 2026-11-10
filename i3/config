@@ -392,3 +392,6 @@ exec_always --no-startup-id ~/.config/scripts/wallpaper-timer.sh
 
 # rog-tune: power — Super+Escape opens the power menu (lock, log out, sleep, hibernate, restart, shut down)
 for_window [class="^RogPower$"] floating enable, border none, move position center
+
+# lag snapshot: Super+Shift+F12 when the machine lags; writes ~/lag-notes.log (nothing runs in the background)
+bindsym $mod+Shift+F12 exec --no-startup-id ~/.local/bin/lag-now
