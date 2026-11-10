@@ -1,4 +1,7 @@
 #!/bin/bash
+# iwd-status: polybar network module. Prints the connected network name (or "Disconnected") for the interface below.
+#   Needs: iwctl (iwd). No root. The interface is hard-coded as wlan0; polybar runs it every 5 seconds (module/network).
+
 # ~/.config/polybar/scripts/iwd-status.sh
 
 IFACE="wlan0"

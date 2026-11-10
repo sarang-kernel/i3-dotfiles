@@ -1,4 +1,9 @@
 #!/bin/bash
+# pen-setup: map the ASUS stylus and touchscreen to the internal panel (run once at login by i3).
+#   Needs: xinput (and xsetwacom, optional, for the pressure curve). No root.
+#   What it does: maps the stylus (ELAN9008:00 04F3:40FD Stylus) and the touchscreen to the panel, enables the stylus, sets a linear
+#   pressure curve, makes pen button 2 a right click and button 3 a middle click, and ignores touch while typing.
+#   Exits 1 with "Pen not detected" when the stylus is not present. The panel name (eDP-1 or eDP-2) is looked up at run time.
 
 PEN="ELAN9008:00 04F3:40FD Stylus"
 TOUCH="ELAN9008:00 04F3:40FD"

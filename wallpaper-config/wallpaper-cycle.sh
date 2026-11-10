@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# wallpaper-cycle: next wallpaper (Super+Y). The reverse script steps backwards. No root; needs feh.
+#   Folders: ~/Pictures/wallpapers/day and /night (or the base folder if they do not both exist). Day = WALL_DAY_START..WALL_NIGHT_START
+#   (settings.env, default 07:00-19:00). A per-folder list is rebuilt only when the file names change; the position is kept in
+#   ~/.cache/wallpaper-cycle. Writes the chosen path to ~/.cache/current_wallpaper and runs login-bg.sh (lock screen, login screen, accent).
+
 set -euo pipefail
 
 BASE_DIR="$HOME/Pictures/wallpapers"

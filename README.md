@@ -28,6 +28,10 @@ Every shot here was taken on a throwaway virtual screen running the same configs
 ![Spotlight on the desktop, searching for settings](docs/img/spotlight.png)
 *My Spotlight on top of all that. Its own repo has the full tour: [sarang-kernel/spotlight](https://github.com/sarang-kernel/spotlight).*
 
+## Documentation
+The full, detailed docs live on a small site: **[https://sarang-kernel.github.io/i3-dotfiles/](https://sarang-kernel.github.io/i3-dotfiles/)**. One section per thing I built: the [i3 desktop](https://sarang-kernel.github.io/i3-dotfiles/i3/), [Spotlight](https://sarang-kernel.github.io/i3-dotfiles/spotlight/), every [script](https://sarang-kernel.github.io/i3-dotfiles/scripts/), [rog-tune](https://sarang-kernel.github.io/i3-dotfiles/rog-tune/), the [restore ISO](https://sarang-kernel.github.io/i3-dotfiles/iso/), [Neovim](https://sarang-kernel.github.io/i3-dotfiles/nvim/) and the [HP home server](https://sarang-kernel.github.io/i3-dotfiles/hp/), plus a [log of what I changed and why](https://sarang-kernel.github.io/i3-dotfiles/changes/).
+The reference tables (keybindings, settings, parts, dependencies, a file index) are generated from the real files, so they cannot drift. The source is in `docs/`.
+
 ## What's in here
 | Folder | What it is |
 |---|---|

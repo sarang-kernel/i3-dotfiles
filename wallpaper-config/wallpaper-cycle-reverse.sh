@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# wallpaper-cycle-reverse: previous wallpaper (Super+Shift+Y). Same as wallpaper-cycle.sh but the index steps backwards.
+#   See wallpaper-cycle.sh for the folders, the cache and what is updated. No root; needs feh.
+
 set -euo pipefail
 
 BASE_DIR="$HOME/Pictures/wallpapers"
