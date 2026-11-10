@@ -6,9 +6,6 @@
 hid=0
 if xdotool search --onlyvisible --class polybar >/dev/null 2>&1; then polybar-msg cmd hide >/dev/null 2>&1 && hid=1; fi
 trap '((hid)) && polybar-msg cmd show >/dev/null 2>&1' EXIT
-# picom can leave the old screen up until the next input event (damage tracking skips the new lock window). SIGUSR1 makes it repaint
-# everything, so poke it once the lock window exists (twice, in case the first lands before it is mapped). No input events needed.
-(sleep 0.4; pkill -USR1 -x picom; sleep 1; pkill -USR1 -x picom) >/dev/null 2>&1 &
 img=$HOME/.cache/lock-bg.png
 base=(--nofork --ignore-empty-password --show-failed-attempts -c 14110f)
 [[ -f $img ]] && base+=(-i "$img")
