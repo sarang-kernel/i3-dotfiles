@@ -1,0 +1,21 @@
+== 30s sample · machine 1.1% busy (18% of one core, 16 threads)
+   CPU(1 core)   RAM MB procs  app
+         15.3%     1407    11  electron
+          0.3%      219     2  kitty
+          0.5%      123     4  startx
+          0.7%       11     1  polybar
+          0.0%       77     4  kitten
+          0.3%       30     1  picom
+          0.2%       13     1  wireplumber
+          0.2%        7     1  greenclip
+== dGPU (RTX) power state, from sysfs
+   0000:01:00.0 control=on status=active suspended 0s of 4792s
+== heat and fans
+   nvme: 34 °C
+   amdgpu: 43 °C
+   k10temp: 46 °C
+   asus: cpu_fan 5800 RPM, gpu_fan 3700 RPM
+   acpitz (thermal_zone0): 46 °C
+== display / cpu
+   mode: 2560x1600 165.00*+  (* = current)
+   average CPU clock 2034 MHz · profile balanced · governor powersave

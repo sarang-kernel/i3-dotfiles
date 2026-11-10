@@ -1,0 +1,10 @@
+== modes
+  quiet: 5.36 W average (24 samples)
+  balanced: 5.65 W average (24 samples)
+  performance: 7.85 W average (24 samples)
+== refresh rate, static desktop, Balanced mode (the display agent is paused)
+  60 Hz: 5.93 W average (24 samples)
+  90 Hz: 5.94 W average (24 samples)
+  120 Hz: 6.30 W average (24 samples)
+  165 Hz: 6.46 W average (24 samples)
+  (if 60 Hz is not clearly below the higher rates, adaptive refresh saves nothing here: switch it off in Settings -> Display)
