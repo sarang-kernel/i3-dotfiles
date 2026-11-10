@@ -395,3 +395,7 @@ for_window [class="^RogPower$"] floating enable, border none, move position cent
 
 # lag snapshot: Super+Shift+F12 when the machine lags; writes ~/lag-notes.log (nothing runs in the background)
 bindsym $mod+Shift+F12 exec --no-startup-id ~/.local/bin/lag-now
+
+# scratch: my notepad (floating Neovim on ~/Documents/scratch.md, autosaves). Super+N toggles it; also in Spotlight as "scratch".
+for_window [class="^scratch$"] floating enable, resize set 1100 760, move position center
+bindsym $mod+n exec --no-startup-id ~/.config/scripts/scratch.sh
