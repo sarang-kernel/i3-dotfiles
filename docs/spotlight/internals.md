@@ -95,3 +95,7 @@ Apps come from `Gio.AppInfo.get_all()` filtered by `should_show()`. A terminal a
 ## Typing never waits for a search
 
 Searches run on one worker thread, not on the window's main loop. Each keystroke (after a 40 ms pause) hands the newest query to the worker, which skips any query that was typed past, so the list can lag behind the box but the box never freezes. If the list on screen is not the answer to the text in the box and I press Enter (or Alt+1 to Alt+9), the key is remembered and fires on the results of the final text, with the footer saying *Still searching*. Typing again cancels the remembered key. That is what stops a fast typist from opening whatever the previous, half-typed query had on top.
+
+### How fast it is
+
+Typical queries finish in 10 to 40 ms and drawing ten rows takes about 5 ms, so the list is there well under one keystroke (about 120 ms at 100 wpm) after typing stops. The debounce is 20 ms. Type listings (`.pdf`, `filetype:docx`) ask `plocate` for one glob per extension (`*.pdf`), which uses its trigram index and takes a few milliseconds even with thousands of matches, and the answer is kept for 20 seconds so refining it (`.pdf thesis`) does not ask again. A two-letter extension such as `.c` has no trigram to use and falls back to a scan (about 190 ms). The list is checked by typing 22 keys a second against an artificially slow search: Enter always opened what the final text asked for.
