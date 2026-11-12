@@ -91,3 +91,7 @@ Apps come from `Gio.AppInfo.get_all()` filtered by `should_show()`. A terminal a
 | `deep_items`, `deep_roots` | Deep search |
 | `class Spot` | The window: home view, list view, app grid, preview, key handling, placement |
 | `daemon()`, `main()` | Resident mode and command line |
+
+## Typing never waits for a search
+
+Searches run on one worker thread, not on the window's main loop. Each keystroke (after a 40 ms pause) hands the newest query to the worker, which skips any query that was typed past, so the list can lag behind the box but the box never freezes. If the list on screen is not the answer to the text in the box and I press Enter (or Alt+1 to Alt+9), the key is remembered and fires on the results of the final text, with the footer saying *Still searching*. Typing again cancels the remembered key. That is what stops a fast typist from opening whatever the previous, half-typed query had on top.

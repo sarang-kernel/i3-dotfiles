@@ -75,7 +75,7 @@ Any order, combinable, with or without a name. They switch Spotlight to a **sort
 | `kind:ebook` | .epub, .mobi, .azw3, .djvu |
 
 
-A name that is not a kind is taken as the extension itself, so `filetype:py` and `.py` both list every .py file (`kind:code` is the wider group). The listing has **no cap**: the footer says how many files matched, the list draws 60 rows at a time and loads more as you scroll or keep pressing Down. Add words to narrow it (`.pdf thesis`). Trash, caches and hidden folders are left out.
+A name that is not a kind is taken as the extension itself, so `filetype:py` and `.py` both list every .py file (`kind:code` is the wider group). The listing has **no cap**: the footer says how many files matched, the list draws 60 rows at a time and loads more as you scroll or keep pressing Down. Add words to narrow it (`.pdf thesis`). Files in the Trash and in hidden folders are included but marked `(trash)` or `(hidden)` after the name, and listed after the ordinary files. Caches, `site-packages`, `.git`, `node_modules` and similar are still left out.
 
 ## Bookmarks, Zotero, app actions
 

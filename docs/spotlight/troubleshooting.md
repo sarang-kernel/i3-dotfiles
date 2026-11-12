@@ -11,7 +11,7 @@ nav_order: 12
 | `Super+D` does nothing | The daemon is not running or its FIFO is stale. `rog-ui.sh restart`, then try again. Run `python3 ~/.config/scripts/spotlight.py` in a terminal for the traceback |
 | It opens, but launching apps fails | It was started over ssh or before the session had `DISPLAY`/D-Bus. Restart it from a terminal *inside* the desktop |
 | File search finds nothing new | `plocate` is stale: `sudo updatedb` |
-| A `filetype:` or `.ext` listing is empty | Nothing outside Trash, caches and hidden folders has that extension, or the file index is old (`sudo updatedb`) |
+| A `filetype:` or `.ext` listing is empty | Nothing outside caches and build folders has that extension, or the file index is old (`sudo updatedb`) |
 | *Search inside documents* is slow the first time | PDFs are being converted to cached text; later searches are fast |
 | Calculator row does not appear | The text did not look like maths, or `qalc` printed an error; try `=` in front |
 | Clipboard history is empty after a reboot | It is not: it is on disk. If `~/.local/state/spotlight/clipboard.json` is gone or unreadable it starts empty. A history file that is not valid JSON is ignored (starts empty) |
