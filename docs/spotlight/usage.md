@@ -25,7 +25,7 @@ With an empty box you see a **home view**: my last four apps as a tile row, my l
 | `timer 25m`, `timer 1h30m`, `timer 90s`, `timer 10` | A countdown that rings in a window; a bare number means minutes | `timer 25m` |
 | `remind in 10m call back`, `remind 15:30 stand up`, `remind 3pm tea`, `remind tomorrow 9am email` | A reminder | |
 | `timers` (or `alarms`, `reminders`) | List pending ones; Enter cancels the selected | |
-| `kind:pdf in:thesis modified:week` | A **filtered file listing**, newest first (see below) | `kind:code modified:today` |
+| `filetype:pdf`, `.pdf`, `kind:pdf in:thesis modified:week` | A **filtered file listing** of *every* matching file, newest first (see below) | `.docx`, `filetype:mov`, `kind:code modified:today` |
 | `/ phrase` | **Deep search**: look *inside* PDFs, notes, code | `/ eigenvalue` |
 | `h`, `hist`, `history` (+ text) | My shell history; Enter copies the command, Ctrl+Enter runs it in a terminal | `h rsync` |
 | a URL (`https://…` or `www.…`) | An *Open …* row at the top | |
@@ -49,13 +49,14 @@ Ranking: name match quality, minus penalties for hidden folders in the path, for
 
 **Enter** opens with `xdg-open`, **Ctrl+Enter** opens the containing folder, **Alt+Enter** copies the file *as a file* (see [Keys](keys.html#copying)).
 
-## Filters (`kind:`, `in:`, `modified:`)
+## Filters (`filetype:`, `.ext`, `in:`, `modified:`)
 
 Any order, combinable, with or without a name. They switch Spotlight to a **sorted-by-time file listing** of up to 10 rows (hidden folders are skipped).
 
 | Filter | Values |
 |---|---|
-| `kind:` or `type:` | `folder` and the kinds in the table below |
+| `filetype:`, `kind:`, `type:`, `ft:` or `ext:` | `folder`, a kind from the table below, or **any extension** (`filetype:mov`, `filetype:.epub`). Several at once with commas: `filetype:mp4,mkv` |
+| a bare `.ext` word | The same filter with less typing: `.pdf`, `.docx`, `.mov`. It needs a letter in it, so `.5` stays a number. If nothing has that extension (`.bashrc`), Spotlight carries on with a normal search |
 | `in:` | a word that must appear in the path (relative to home), e.g. `in:thesis` |
 | `modified:` or `mod:` | `today` (or `day`), `week`, `month` |
 
@@ -65,15 +66,16 @@ Any order, combinable, with or without a name. They switch Spotlight to a **sort
 | `kind:doc` | .doc, .docx, .odt, .rtf, .pages |
 | `kind:slides` | .ppt, .pptx, .odp, .key |
 | `kind:sheet` | .xls, .xlsx, .ods, .csv, .tsv |
-| `kind:image` | .png, .jpg, .jpeg, .gif, .webp, .svg, .avif, .bmp, .tif, .tiff |
+| `kind:image` | .png, .jpg, .jpeg, .gif, .webp, .svg, .avif, .bmp, .tif, .tiff, .heic |
 | `kind:text` | .txt, .md, .org, .rst, .tex, .bib |
 | `kind:code` | .py, .rs, .c, .h, .cpp, .js, .ts, .sh, .go, .java, .ipynb, .r |
-| `kind:audio` | .mp3, .flac, .ogg, .opus, .wav, .m4a |
-| `kind:video` | .mp4, .mkv, .webm, .avi, .mov |
-| `kind:archive` | .zip, .tar, .gz, .xz, .7z, .rar, .tgz |
+| `kind:audio` | .mp3, .flac, .ogg, .opus, .wav, .m4a, .aac, .wma |
+| `kind:video` | .mp4, .mkv, .webm, .avi, .mov, .m4v, .wmv, .flv, .mpg, .mpeg |
+| `kind:archive` | .zip, .tar, .gz, .xz, .7z, .rar, .tgz, .bz2, .zst |
+| `kind:ebook` | .epub, .mobi, .azw3, .djvu |
 
 
-`kind:py` does **not** exist; use `kind:code`. An unknown kind returns no results (that is the "No results" you get).
+A name that is not a kind is taken as the extension itself, so `filetype:py` and `.py` both list every .py file (`kind:code` is the wider group). The listing has **no cap**: the footer says how many files matched, the list draws 60 rows at a time and loads more as you scroll or keep pressing Down. Add words to narrow it (`.pdf thesis`). Trash, caches and hidden folders are left out.
 
 ## Bookmarks, Zotero, app actions
 

@@ -41,7 +41,7 @@ Typing waits 90 ms after the last keystroke (debounce), then calls `search(q)`:
 
 1. `>` → the *Run* row only.
 2. Timer/reminder syntax → alarm rows only.
-3. `kind:/in:/modified:` filters → the filtered file listing only.
+3. `filetype:`/`kind:`/`.ext`/`in:`/`modified:` filters → the filtered file listing only.
 4. `:` → emoji only. `h/hist/history` → shell history. `c/clip` → clipboard. `w` → windows.
 5. Otherwise **everything is gathered** (calculator, apps, windows, actions, files, web; then aliases, app actions, bookmarks and Zotero, each wrapped in its own try/except so one broken source cannot break the box) and, for 3+ characters with no file hits, a *Deep* row is added.
 6. The union is sorted by score and cut to **10 rows** (`MAXROWS`).
